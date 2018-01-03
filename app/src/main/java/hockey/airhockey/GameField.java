@@ -14,6 +14,7 @@ import android.view.SurfaceView;
 
 import static hockey.airhockey.MainActivity.height;
 import static hockey.airhockey.MainActivity.playerScale;
+import static hockey.airhockey.MainActivity.puckScale;
 import static hockey.airhockey.MainActivity.width;
 
 public class GameField extends SurfaceView implements Runnable {
@@ -21,9 +22,11 @@ public class GameField extends SurfaceView implements Runnable {
     Thread thread;
     SurfaceHolder holder;
     boolean isDrawing, isDragging1, isDragging2;
-    VectorDrawableCompat background, player1, player2;
+    VectorDrawableCompat background, player1, player2,puck;
     Paint paint = new Paint();
-    int player1X, player2X, player1Y, player2Y, x, y;
+    int player1X, player2X, player1Y, player2Y, x, y,puckX,puckY;
+    float xp1, xp2, yp1, yp2, v1, v2;
+    long sec, psec;
     private SparseArray<PointF> activePointers;
     int dragPointer1, dragPointer2;
 
@@ -49,14 +52,34 @@ public class GameField extends SurfaceView implements Runnable {
         if (player2 != null) {
             player2.setBounds(player2X - playerScale, player2Y - playerScale, player2X + playerScale, player2Y + playerScale);
         }
+        puck = VectorDrawableCompat.create(context.getResources(), R.drawable.puck, null);
+        puckX = width / 2;
+        puckY = height/2;
+        if (puck != null) {
+            puck.setBounds(puckX - puckScale, puckY - puckScale, puckX + puckScale, puckY + puckScale);
+        }
         dragPointer1 = -1;
         dragPointer2 = -1;
+        xp1 = player1X;
+        yp1 = player1Y;
+        xp2 = player2X;
+        yp2 = player2Y;
+        psec = System.currentTimeMillis();
         thread.start();
     }
 
     private void update() {
         player1.setBounds(player1X - playerScale, player1Y - playerScale, player1X + playerScale, player1Y + playerScale);
         player2.setBounds(player2X - playerScale, player2Y - playerScale, player2X + playerScale, player2Y + playerScale);
+        puck.setBounds(puckX - puckScale, puckY - puckScale, puckX + puckScale, puckY + puckScale);
+        sec = System.currentTimeMillis();
+        v1 = (float) Math.sqrt(Math.pow((player1X - xp1) / (sec - psec), 2) + Math.pow((player1Y - yp1) / (sec - psec), 2));
+        v2 = (float) Math.sqrt(Math.pow((player2X - xp2) / (sec - psec), 2) + Math.pow((player2Y - yp2) / (sec - psec), 2));
+        xp1 = player1X;
+        yp1 = player1Y;
+        xp2 = player2X;
+        yp2 = player2Y;
+        psec = sec;
     }
 
     @Override
@@ -153,9 +176,6 @@ public class GameField extends SurfaceView implements Runnable {
         } else if (player2Y < height / 2 + playerScale) {
             player2Y = height / 2 + playerScale;
         }
-
-        System.out.println("1: " + isDragging1 + " " + dragPointer1 + " 2: " + isDragging2 + " " + dragPointer2 + " now: " + pointerId + " " + pointerIndex);
-
         return true;
     }
 
@@ -164,6 +184,7 @@ public class GameField extends SurfaceView implements Runnable {
         background.draw(canvas);
         player1.draw(canvas);
         player2.draw(canvas);
+        puck.draw(canvas);
     }
 
     public void pauseDrawing() {
