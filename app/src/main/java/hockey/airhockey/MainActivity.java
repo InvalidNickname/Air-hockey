@@ -8,15 +8,17 @@ public class MainActivity extends AppCompatActivity {
 
     GameField gameField;
     public static final String TAG = "MAIN";
-    static int width, height,playerScale,puckScale;
+    static int width, height, playerScale, puckScale, playerMass, puckMass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         width = getResources().getDisplayMetrics().widthPixels;
         height = getResources().getDisplayMetrics().heightPixels;
-        playerScale = getResources().getDisplayMetrics().widthPixels/8;
-        puckScale = getResources().getDisplayMetrics().widthPixels/9;
+        playerScale = getResources().getDisplayMetrics().widthPixels / getResources().getInteger(R.integer.player_scale);
+        puckScale = getResources().getDisplayMetrics().widthPixels / getResources().getInteger(R.integer.puck_scale);
+        playerMass = getResources().getInteger(R.integer.player_mass);
+        puckMass = getResources().getInteger(R.integer.puck_mass);
         gameField = new GameField(this);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(gameField);

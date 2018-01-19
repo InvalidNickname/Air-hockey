@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="player_scale">8</integer>
+    <integer name="puck_scale">9</integer>
+    <integer name="player_mass">1</integer>
+    <integer name="puck_mass">1</integer>
+</resources>

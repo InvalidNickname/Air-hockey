@@ -22,10 +22,11 @@ public class GameField extends SurfaceView implements Runnable {
     Thread thread;
     SurfaceHolder holder;
     boolean isDrawing, isDragging1, isDragging2;
-    VectorDrawableCompat background, player1, player2,puck;
+    VectorDrawableCompat background, puck;
     Paint paint = new Paint();
-    int player1X, player2X, player1Y, player2Y, x, y,puckX,puckY;
-    float xp1, xp2, yp1, yp2, v1, v2;
+    int x, y, puckX, puckY;
+    Player player1, player2;
+    float puckVx, puckVy;
     long sec, psec;
     private SparseArray<PointF> activePointers;
     int dragPointer1, dragPointer2;
@@ -40,46 +41,56 @@ public class GameField extends SurfaceView implements Runnable {
         if (background != null) {
             background.setBounds(0, 0, width, MainActivity.height);
         }
-        player1 = VectorDrawableCompat.create(context.getResources(), R.drawable.player, null);
-        player1X = width / 2;
-        player1Y = 2 * playerScale;
-        if (player1 != null) {
-            player1.setBounds(player1X - playerScale, player1Y - playerScale, player1X + playerScale, player1Y + playerScale);
-        }
-        player2 = VectorDrawableCompat.create(context.getResources(), R.drawable.player, null);
-        player2X = width / 2;
-        player2Y = height - 2 * playerScale;
-        if (player2 != null) {
-            player2.setBounds(player2X - playerScale, player2Y - playerScale, player2X + playerScale, player2Y + playerScale);
-        }
+        player1 = new Player(R.drawable.player, context, 1);
+        player2 = new Player(R.drawable.player, context, 2);
         puck = VectorDrawableCompat.create(context.getResources(), R.drawable.puck, null);
         puckX = width / 2;
-        puckY = height/2;
+        puckY = height / 2;
         if (puck != null) {
             puck.setBounds(puckX - puckScale, puckY - puckScale, puckX + puckScale, puckY + puckScale);
         }
         dragPointer1 = -1;
         dragPointer2 = -1;
-        xp1 = player1X;
-        yp1 = player1Y;
-        xp2 = player2X;
-        yp2 = player2Y;
         psec = System.currentTimeMillis();
+        puckVy = 0;
+        puckVx = 0;
         thread.start();
     }
 
     private void update() {
-        player1.setBounds(player1X - playerScale, player1Y - playerScale, player1X + playerScale, player1Y + playerScale);
-        player2.setBounds(player2X - playerScale, player2Y - playerScale, player2X + playerScale, player2Y + playerScale);
+        player1.update();
+        player2.update();
         puck.setBounds(puckX - puckScale, puckY - puckScale, puckX + puckScale, puckY + puckScale);
         sec = System.currentTimeMillis();
-        v1 = (float) Math.sqrt(Math.pow((player1X - xp1) / (sec - psec), 2) + Math.pow((player1Y - yp1) / (sec - psec), 2));
-        v2 = (float) Math.sqrt(Math.pow((player2X - xp2) / (sec - psec), 2) + Math.pow((player2Y - yp2) / (sec - psec), 2));
-        xp1 = player1X;
-        yp1 = player1Y;
-        xp2 = player2X;
-        yp2 = player2Y;
+        player1.setV(sec, psec);
+        player2.setV(sec, psec);
+        checkCollision();
+        puckX += puckVx * (sec - psec);
+        puckY += puckVy * (sec - psec);
         psec = sec;
+    }
+
+    private void checkCollision() {
+        if (puckY < puckScale) {
+            puckY = puckScale;
+            puckVy = -puckVy;
+        } else if (puckY > height - puckScale) {
+            puckY = height - puckScale;
+            puckVy = -puckVy;
+        }
+        if (puckX < puckScale) {
+            puckX = puckScale;
+            puckVx = -puckVx;
+        } else if (puckX > width - puckScale) {
+            puckX = width - puckScale;
+            puckVx = -puckVx;
+        }
+        if (Math.sqrt(Math.pow(puckX - player1.x, 2) + Math.pow(puckY - player1.y, 2)) < playerScale + puckScale) {
+
+        }
+        if (Math.sqrt(Math.pow(puckX - player2.x, 2) + Math.pow(puckY - player2.y, 2)) < playerScale + puckScale) {
+
+        }
     }
 
     @Override
@@ -120,11 +131,11 @@ public class GameField extends SurfaceView implements Runnable {
                 activePointers.put(pointerId, pointF);
                 x = (int) pointF.x;
                 y = (int) pointF.y;
-                if (isInside(player1X, player1Y)) {
+                if (isInside(player1.x, player1.y)) {
                     isDragging1 = true;
                     dragPointer1 = pointerId;
                 }
-                if (isInside(player2X, player2Y)) {
+                if (isInside(player2.x, player2.y)) {
                     isDragging2 = true;
                     dragPointer2 = pointerId;
                 }
@@ -139,12 +150,12 @@ public class GameField extends SurfaceView implements Runnable {
                         point.x = event.getX(i);
                         point.y = event.getY(i);
                         if (isDragging1 & (pointerId == dragPointer1)) {
-                            player1X = (int) point.x;
-                            player1Y = (int) point.y;
+                            player1.x = (int) point.x;
+                            player1.y = (int) point.y;
                         }
                         if (isDragging2 & (pointerId == dragPointer2)) {
-                            player2X = (int) point.x;
-                            player2Y = (int) point.y;
+                            player2.x = (int) point.x;
+                            player2.y = (int) point.y;
                         }
                     }
                 }
@@ -164,17 +175,17 @@ public class GameField extends SurfaceView implements Runnable {
                 }
                 break;
         }
-        player1X = checkX(player1X);
-        if (player1Y < playerScale) {
-            player1Y = playerScale;
-        } else if (player1Y > height / 2 - playerScale) {
-            player1Y = height / 2 - playerScale;
+        player1.x = checkX(player1.x);
+        if (player1.y < playerScale) {
+            player1.y = playerScale;
+        } else if (player1.y > height / 2 - playerScale) {
+            player1.y = height / 2 - playerScale;
         }
-        player2X = checkX(player2X);
-        if (player2Y > height - playerScale) {
-            player2Y = height - playerScale;
-        } else if (player2Y < height / 2 + playerScale) {
-            player2Y = height / 2 + playerScale;
+        player2.x = checkX(player2.x);
+        if (player2.y > height - playerScale) {
+            player2.y = height - playerScale;
+        } else if (player2.y < height / 2 + playerScale) {
+            player2.y = height / 2 + playerScale;
         }
         return true;
     }
@@ -182,8 +193,8 @@ public class GameField extends SurfaceView implements Runnable {
     private void drawOnCanvas(Canvas canvas) {
         canvas.drawColor(Color.WHITE);
         background.draw(canvas);
-        player1.draw(canvas);
-        player2.draw(canvas);
+        player1.drawPlayer(canvas);
+        player2.drawPlayer(canvas);
         puck.draw(canvas);
     }
 
