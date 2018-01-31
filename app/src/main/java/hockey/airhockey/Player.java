@@ -10,14 +10,16 @@ import static hockey.airhockey.MainActivity.width;
 
 class Player {
 
-    int x, y;
+    int x, y, mass;
     private int xp, yp;
-    float v;
+    float vX, vY;
     private VectorDrawableCompat drawable;
 
     Player(int resId, Context context, int num) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);
-        v = 0;
+        mass = context.getResources().getInteger(R.integer.player_mass);
+        vX = 0;
+        vY = 0;
         x = width / 2;
         if (num == 1) {
             y = 2 * playerScale;
@@ -40,7 +42,8 @@ class Player {
     }
 
     void setV(long sec, long psec) {
-        v = (float) Math.sqrt(Math.pow((x - xp) / (sec - psec), 2) + Math.pow((y - yp) / (sec - psec), 2));
+        vX = (xp - x) / (sec - psec);
+        vY = (yp - y) / (sec - psec);
         xp = x;
         yp = y;
     }
