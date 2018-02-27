@@ -61,6 +61,7 @@ public class GameField extends SurfaceView implements Runnable {
         player2.update();
         puck.update(sec, psec);
         psec = sec;
+        System.out.println("Puck speed:\nx: " + puck.vX + ", y: " + puck.vY);
     }
 
     private void checkCollision() {
@@ -80,44 +81,34 @@ public class GameField extends SurfaceView implements Runnable {
         }
         if ((Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) < playerScale + puckScale) & !isCollision) {
             collisionWithPuck(player1);
-            isCollision = true;
+            //isCollision = true;
         }
         if ((Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) < playerScale + puckScale) & !isCollision) {
             collisionWithPuck(player2);
-            isCollision = true;
+            //isCollision = true;
         }
-        if ((Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) > playerScale + puckScale) & (Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) > playerScale + puckScale)) {
-            isCollision = false;
-        }
+        //if ((Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) > playerScale + puckScale) & (Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) > playerScale + puckScale)) {
+        //    isCollision = false;
+        //}
     }
 
     private void collisionWithPuck(Player player) {
+        // Увага! Нижче йде говнофізіка!
         double alpha = Math.acos((player.x - puck.x) / Math.sqrt(Math.pow(puck.x - player.x, 2) + Math.pow(puck.y - player.y, 2)));
-        double beta = Math.PI / 2 - alpha;
-        double vYProjectionPuck, vYProjectionPlayer, vXProjectionPuck, vXProjectionPlayer, vYPuck, vXPuck;
-        double vPlayer = Math.sqrt(Math.pow(player.vX, 2) + Math.pow(player.vY, 2));
-        double vPuck = Math.sqrt(Math.pow(puck.vX, 2) + Math.pow(puck.vY, 2));
-        System.out.println("Puck before collision. vX: " + puck.vX + " vY: " + puck.vY);
-        if (puck.vY == 0) {
-            vYProjectionPuck = puck.vX * Math.cos(alpha);
-            vXProjectionPuck = puck.vX * Math.cos(beta);
+        double relativeVX = puck.vX - player.vX;
+        double relativeVY = puck.vY - player.vY;
+        double relativeV = Math.sqrt(Math.pow(relativeVX, 2) + Math.pow(relativeVY, 2));
+        double gamma = relativeVY / relativeV;
+        double collidedVY, collidedVX;
+        if (relativeVY != 0) {
+            collidedVY = -relativeV * Math.cos(gamma - alpha);
+            collidedVX = relativeV * Math.sin(gamma - alpha);
         } else {
-            vYProjectionPuck = vPuck * Math.cos(Math.atan(puck.vX / puck.vY) + beta);
-            vXProjectionPuck = vPuck * Math.cos(alpha - Math.atan(puck.vX / puck.vY));
+            collidedVY = -relativeV * Math.sin(alpha);
+            collidedVX = relativeV * Math.cos(alpha);
         }
-        if (player.vY == 0) {
-            vYProjectionPlayer = player.vX * Math.cos(alpha);
-            vXProjectionPlayer = player.vX * Math.cos(beta);
-        } else {
-            vYProjectionPlayer = vPlayer * Math.cos(Math.atan(player.vX / player.vY) + beta);
-            vXProjectionPlayer = vPlayer * Math.cos(alpha - Math.atan(player.vX / player.vY));
-        }
-        vYPuck = -(vYProjectionPuck - vYProjectionPlayer);
-        vXPuck = vXProjectionPuck - vXProjectionPlayer;
-        puck.vY = vYPuck * Math.cos(beta) + vXPuck * Math.cos(alpha);
-        puck.vX = vXPuck * Math.cos(beta) + vYPuck * Math.cos(alpha);
-        isCollision = true;
-        System.out.println("Collision, time: " + (sec - psec) + "\nAlpha: " + alpha + "\nvPlayer: " + vPlayer + "\nvPuck: " + vPuck + "\nplayerProjection: " + vXProjectionPlayer + " " + vYProjectionPlayer + "\npuckProjection: " + vXProjectionPuck + " " + vYProjectionPuck + "\nvYPuck: " + vYPuck + "\nvXPuck: " + vXPuck + "\nvY: " + puck.vY + "\nvX: " + puck.vX);
+        puck.vX = collidedVX * Math.cos(alpha) + collidedVY * Math.sin(alpha);
+        puck.vY = collidedVX * Math.sin(alpha) + collidedVY * Math.cos(alpha);
     }
 
     @Override

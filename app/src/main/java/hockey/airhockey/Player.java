@@ -10,14 +10,13 @@ import static hockey.airhockey.MainActivity.width;
 
 class Player {
 
-    int x, y, mass;
+    int x, y;
     private int xp, yp;
     float vX, vY;
     private VectorDrawableCompat drawable;
 
     Player(int resId, Context context, int num) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);
-        mass = context.getResources().getInteger(R.integer.player_mass);
         vX = 0;
         vY = 0;
         x = width / 2;
