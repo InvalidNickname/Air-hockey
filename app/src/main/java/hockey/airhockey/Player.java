@@ -12,7 +12,7 @@ class Player {
 
     int x, y;
     private int xp, yp;
-    float vX, vY;
+    double vX, vY;
     private VectorDrawableCompat drawable;
 
     Player(int resId, Context context, int num) {
@@ -41,8 +41,8 @@ class Player {
     }
 
     void setV(long sec, long psec) {
-        vX = (xp - x) / (sec - psec);
-        vY = (yp - y) / (sec - psec);
+        vX = (x - xp + 0.) / (sec - psec);
+        vY = (y - yp + 0.) / (sec - psec);
         xp = x;
         yp = y;
     }

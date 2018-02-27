@@ -22,12 +22,12 @@ public class GameField extends SurfaceView implements Runnable {
 
     private Thread thread;
     private SurfaceHolder holder;
-    private boolean isDrawing, isDragging1, isDragging2, isCollision;
+    private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2;
     private VectorDrawableCompat background;
     private int x, y;
     private Player player1, player2;
     private Puck puck;
-    private long psec, sec;
+    private long psec;
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2;
 
@@ -47,13 +47,14 @@ public class GameField extends SurfaceView implements Runnable {
         puck = new Puck(R.drawable.puck, context);
         dragPointer1 = -1;
         dragPointer2 = -1;
-        isCollision = false;
+        isCollision1 = false;
+        isCollision2 = false;
         psec = System.currentTimeMillis();
         thread.start();
     }
 
     private void update() {
-        sec = System.currentTimeMillis();
+        long sec = System.currentTimeMillis();
         player1.setV(sec, psec);
         player2.setV(sec, psec);
         checkCollision();
@@ -61,7 +62,6 @@ public class GameField extends SurfaceView implements Runnable {
         player2.update();
         puck.update(sec, psec);
         psec = sec;
-        System.out.println("Puck speed:\nx: " + puck.vX + ", y: " + puck.vY);
     }
 
     private void checkCollision() {
@@ -79,26 +79,30 @@ public class GameField extends SurfaceView implements Runnable {
             puck.x = width - puckScale;
             puck.vX = -puck.vX;
         }
-        if ((Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) < playerScale + puckScale) & !isCollision) {
+        if ((Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) < playerScale + puckScale - 5) & !isCollision1) {
             collisionWithPuck(player1);
-            //isCollision = true;
+            isCollision1 = true;
         }
-        if ((Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) < playerScale + puckScale) & !isCollision) {
+        if ((Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) < playerScale + puckScale - 5) & !isCollision2) {
             collisionWithPuck(player2);
-            //isCollision = true;
+            isCollision2 = true;
         }
-        //if ((Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) > playerScale + puckScale) & (Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) > playerScale + puckScale)) {
-        //    isCollision = false;
-        //}
+        if (Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) > playerScale + puckScale - 5) {
+            isCollision2 = false;
+        }
+        if (Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) > playerScale + puckScale - 5) {
+            isCollision1 = false;
+        }
     }
 
     private void collisionWithPuck(Player player) {
         // Увага! Нижче йде говнофізіка!
+        System.out.println("        Speed before collision x: " + puck.vX + " y: " + puck.vY);
         double alpha = Math.acos((player.x - puck.x) / Math.sqrt(Math.pow(puck.x - player.x, 2) + Math.pow(puck.y - player.y, 2)));
         double relativeVX = puck.vX - player.vX;
         double relativeVY = puck.vY - player.vY;
         double relativeV = Math.sqrt(Math.pow(relativeVX, 2) + Math.pow(relativeVY, 2));
-        double gamma = relativeVY / relativeV;
+        double gamma = Math.acos(relativeVY / relativeV);
         double collidedVY, collidedVX;
         if (relativeVY != 0) {
             collidedVY = -relativeV * Math.cos(gamma - alpha);
@@ -109,6 +113,7 @@ public class GameField extends SurfaceView implements Runnable {
         }
         puck.vX = collidedVX * Math.cos(alpha) + collidedVY * Math.sin(alpha);
         puck.vY = collidedVX * Math.sin(alpha) + collidedVY * Math.cos(alpha);
+        System.out.println("Alpha: " + alpha + "\nPlayer x: " + player.vX + " y: " + player.vY + "\nrelative x: " + relativeVX + " y: " + relativeVY + " total: " + relativeV + "\nGamma: " + gamma + "\nCollided x: " + collidedVX + " y: " + collidedVY + "\nV x: " + puck.vX + " y: " + puck.vY);
     }
 
     @Override

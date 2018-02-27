@@ -2,4 +2,5 @@
 <resources>
     <integer name="player_scale">8</integer>
     <integer name="puck_scale">9</integer>
+    <integer name="max_puck_speed">1</integer>
 </resources>
