@@ -22,12 +22,12 @@ public class GameField extends SurfaceView implements Runnable {
 
     private Thread thread;
     private SurfaceHolder holder;
-    private boolean isDrawing, isDragging1, isDragging2;
+    private boolean isDrawing, isDragging1, isDragging2, isCollision;
     private VectorDrawableCompat background;
     private int x, y;
     private Player player1, player2;
     private Puck puck;
-    private long psec;
+    private long psec, sec;
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2;
 
@@ -47,12 +47,13 @@ public class GameField extends SurfaceView implements Runnable {
         puck = new Puck(R.drawable.puck, context);
         dragPointer1 = -1;
         dragPointer2 = -1;
+        isCollision = false;
         psec = System.currentTimeMillis();
         thread.start();
     }
 
     private void update() {
-        long sec = System.currentTimeMillis();
+        sec = System.currentTimeMillis();
         player1.setV(sec, psec);
         player2.setV(sec, psec);
         checkCollision();
@@ -77,17 +78,46 @@ public class GameField extends SurfaceView implements Runnable {
             puck.x = width - puckScale;
             puck.vX = -puck.vX;
         }
-        if (Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) < playerScale + puckScale) {
+        if ((Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) < playerScale + puckScale) & !isCollision) {
             collisionWithPuck(player1);
+            isCollision = true;
         }
-        if (Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) < playerScale + puckScale) {
+        if ((Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) < playerScale + puckScale) & !isCollision) {
             collisionWithPuck(player2);
+            isCollision = true;
+        }
+        if ((Math.sqrt(Math.pow(puck.x - player2.x, 2) + Math.pow(puck.y - player2.y, 2)) > playerScale + puckScale) & (Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) > playerScale + puckScale)) {
+            isCollision = false;
         }
     }
 
     private void collisionWithPuck(Player player) {
-        //puck.vX=((puck.mass-player.mass)*puck.vX+2*player.mass*player.vX)/(player.mass+puck.mass);
-        //puck.vY=((puck.mass-player.mass)*puck.vY+2*player.mass*player.vY)/(player.mass+puck.mass);
+        double alpha = Math.acos((player.x - puck.x) / Math.sqrt(Math.pow(puck.x - player.x, 2) + Math.pow(puck.y - player.y, 2)));
+        double beta = Math.PI / 2 - alpha;
+        double vYProjectionPuck, vYProjectionPlayer, vXProjectionPuck, vXProjectionPlayer, vYPuck, vXPuck;
+        double vPlayer = Math.sqrt(Math.pow(player.vX, 2) + Math.pow(player.vY, 2));
+        double vPuck = Math.sqrt(Math.pow(puck.vX, 2) + Math.pow(puck.vY, 2));
+        System.out.println("Puck before collision. vX: " + puck.vX + " vY: " + puck.vY);
+        if (puck.vY == 0) {
+            vYProjectionPuck = puck.vX * Math.cos(alpha);
+            vXProjectionPuck = puck.vX * Math.cos(beta);
+        } else {
+            vYProjectionPuck = vPuck * Math.cos(Math.atan(puck.vX / puck.vY) + beta);
+            vXProjectionPuck = vPuck * Math.cos(alpha - Math.atan(puck.vX / puck.vY));
+        }
+        if (player.vY == 0) {
+            vYProjectionPlayer = player.vX * Math.cos(alpha);
+            vXProjectionPlayer = player.vX * Math.cos(beta);
+        } else {
+            vYProjectionPlayer = vPlayer * Math.cos(Math.atan(player.vX / player.vY) + beta);
+            vXProjectionPlayer = vPlayer * Math.cos(alpha - Math.atan(player.vX / player.vY));
+        }
+        vYPuck = -(vYProjectionPuck - vYProjectionPlayer);
+        vXPuck = vXProjectionPuck - vXProjectionPlayer;
+        puck.vY = vYPuck * Math.cos(beta) + vXPuck * Math.cos(alpha);
+        puck.vX = vXPuck * Math.cos(beta) + vYPuck * Math.cos(alpha);
+        isCollision = true;
+        System.out.println("Collision, time: " + (sec - psec) + "\nAlpha: " + alpha + "\nvPlayer: " + vPlayer + "\nvPuck: " + vPuck + "\nplayerProjection: " + vXProjectionPlayer + " " + vYProjectionPlayer + "\npuckProjection: " + vXProjectionPuck + " " + vYProjectionPuck + "\nvYPuck: " + vYPuck + "\nvXPuck: " + vXPuck + "\nvY: " + puck.vY + "\nvX: " + puck.vX);
     }
 
     @Override

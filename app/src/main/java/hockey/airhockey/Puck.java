@@ -11,7 +11,7 @@ import static hockey.airhockey.MainActivity.width;
 class Puck {
 
     int x, y, mass;
-    float vX, vY;
+    double vX, vY;
     private VectorDrawableCompat drawable;
 
     Puck(int resId, Context context) {
@@ -27,11 +27,17 @@ class Puck {
     }
 
     void update(long sec, long psec) {
-        if (vX > 20) {
-            vX = 10;
+        if (vX > 5) {
+            vX = 5;
         }
-        if (vY > 20) {
-            vY = 10;
+        if (vY > 5) {
+            vY = 5;
+        }
+        if (vX < -5) {
+            vX = -5;
+        }
+        if (vY < -5) {
+            vY = -5;
         }
         x += vX * (sec - psec);
         y += vY * (sec - psec);
