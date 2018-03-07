@@ -12,13 +12,12 @@ class Player {
 
     int x, y;
     private int xp, yp;
-    double vX, vY;
+    Vector v;
     private VectorDrawableCompat drawable;
 
     Player(int resId, Context context, int num) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);
-        vX = 0;
-        vY = 0;
+        v = new Vector(0, 0);
         x = width / 2;
         if (num == 1) {
             y = 2 * playerScale;
@@ -41,8 +40,8 @@ class Player {
     }
 
     void setV(long sec, long psec) {
-        vX = (x - xp + 0.) / (sec - psec);
-        vY = (y - yp + 0.) / (sec - psec);
+        v.x = (x - xp + 0.) / (sec - psec);
+        v.y = (y - yp + 0.) / (sec - psec);
         xp = x;
         yp = y;
     }

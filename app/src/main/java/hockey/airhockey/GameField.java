@@ -67,17 +67,17 @@ public class GameField extends SurfaceView implements Runnable {
     private void checkCollision() {
         if (puck.y < puckScale) {
             puck.y = puckScale;
-            puck.vY = -puck.vY;
+            puck.v.y = -puck.v.y;
         } else if (puck.y > height - puckScale) {
             puck.y = height - puckScale;
-            puck.vY = -puck.vY;
+            puck.v.y = -puck.v.y;
         }
         if (puck.x < puckScale) {
             puck.x = puckScale;
-            puck.vX = -puck.vX;
+            puck.v.x = -puck.v.x;
         } else if (puck.x > width - puckScale) {
             puck.x = width - puckScale;
-            puck.vX = -puck.vX;
+            puck.v.x = -puck.v.x;
         }
         if ((Math.sqrt(Math.pow(puck.x - player1.x, 2) + Math.pow(puck.y - player1.y, 2)) < playerScale + puckScale - 5) & !isCollision1) {
             collisionWithPuck(player1);
@@ -97,23 +97,23 @@ public class GameField extends SurfaceView implements Runnable {
 
     private void collisionWithPuck(Player player) {
         // Увага! Нижче йде говнофізіка!
-        System.out.println("        Speed before collision x: " + puck.vX + " y: " + puck.vY);
+        Vector relative;
+        Vector collided = new Vector(0, 0);
+        System.out.println("        Speed before collision x: " + puck.v.x + " y: " + puck.v.y);
         double alpha = Math.acos((player.x - puck.x) / Math.sqrt(Math.pow(puck.x - player.x, 2) + Math.pow(puck.y - player.y, 2)));
-        double relativeVX = puck.vX - player.vX;
-        double relativeVY = puck.vY - player.vY;
-        double relativeV = Math.sqrt(Math.pow(relativeVX, 2) + Math.pow(relativeVY, 2));
-        double gamma = Math.acos(relativeVY / relativeV);
-        double collidedVY, collidedVX;
-        if (relativeVY != 0) {
-            collidedVY = -relativeV * Math.cos(gamma - alpha);
-            collidedVX = relativeV * Math.sin(gamma - alpha);
-        } else {
-            collidedVY = -relativeV * Math.sin(alpha);
-            collidedVX = relativeV * Math.cos(alpha);
-        }
-        puck.vX = collidedVX * Math.cos(alpha) + collidedVY * Math.sin(alpha);
-        puck.vY = collidedVX * Math.sin(alpha) + collidedVY * Math.cos(alpha);
-        System.out.println("Alpha: " + alpha + "\nPlayer x: " + player.vX + " y: " + player.vY + "\nrelative x: " + relativeVX + " y: " + relativeVY + " total: " + relativeV + "\nGamma: " + gamma + "\nCollided x: " + collidedVX + " y: " + collidedVY + "\nV x: " + puck.vX + " y: " + puck.vY);
+        relative = puck.v.deductVector(player.v);
+        collided.y = -(relative.x * Math.cos(alpha) + relative.y * Math.sin(alpha));
+        collided.x = relative.x * Math.sin(alpha) - Math.abs(relative.y) * Math.cos(alpha);
+        puck.v.x = collided.x * Math.sin(alpha) + collided.y * Math.cos(alpha);
+        puck.v.y = collided.x * Math.cos(alpha) + collided.y * Math.sin(alpha);
+
+        System.out.println("Alpha: " + alpha);
+        System.out.println("relativeVX: " + relative.x + " = " + puck.v.x + " - " + player.v.x);
+        System.out.println("relativeVY: " + relative.y + " = " + puck.v.y + " - " + player.v.y);
+        System.out.println("collidedVY: " + collided.y + " = -( " + relative.x + " * " + Math.cos(alpha) + " + " + relative.y + " * " + Math.sin(alpha) + " )");
+        System.out.println("collidedVX: " + collided.x + " = " + relative.x + " * " + Math.sin(alpha) + " + " + relative.y + " * " + Math.cos(alpha));
+        System.out.println("puck.vX: " + puck.v.x + " = " + collided.x + " * " + Math.sin(alpha) + " + " + collided.y + " * " + Math.cos(alpha));
+        System.out.println("puck.vY: " + puck.v.y + " = " + collided.x + " * " + Math.cos(alpha) + " + " + collided.y + " * " + Math.sin(alpha));
     }
 
     @Override

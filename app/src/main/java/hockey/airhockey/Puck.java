@@ -11,13 +11,12 @@ import static hockey.airhockey.MainActivity.width;
 class Puck {
 
     int x, y;
-    double vX, vY;
+    Vector v;
     private VectorDrawableCompat drawable;
 
     Puck(int resId, Context context) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);
-        vX = 0;
-        vY = 0;
+        v = new Vector(0, 0);
         x = width / 2;
         y = height / 2;
         if (drawable != null) {
@@ -26,20 +25,21 @@ class Puck {
     }
 
     void update(long sec, long psec) {
-        if (vX > 1) {
-            vX = 1;
-        }
-        if (vY > 1) {
-            vY = 1;
-        }
-        if (vX < -1) {
-            vX = -1;
-        }
-        if (vY < -1) {
-            vY = -1;
-        }
-        x += vX * (sec - psec);
-        y += vY * (sec - psec);
+        x += v.x * (sec - psec);
+        y += v.y * (sec - psec);
+       /* if (vX != 0 & vY != 0) {
+            boolean upOrDown = vY > 0;
+            double alpha = Math.acos(vX / Math.sqrt(Math.pow(vX, 2) + Math.pow(vY, 2)));
+            double v = Math.sqrt(Math.pow(vX, 2) + Math.pow(vY, 2));
+            vX = 0.999 * Math.cos(alpha) * v;
+            vY = 0.999 * Math.sin(alpha) * v;
+            if (!upOrDown) {
+                vY = -vY;
+            }
+        } else {
+            vY *= 0.999;
+            vX *= 0.999;
+        }*/
         drawable.setBounds(x - puckScale, y - puckScale, x + puckScale, y + puckScale);
     }
 
