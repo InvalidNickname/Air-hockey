@@ -4,8 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.util.Log;
 import android.util.SparseArray;
@@ -22,6 +23,8 @@ public class GameField extends SurfaceView implements Runnable {
 
     private Thread thread;
     private SurfaceHolder holder;
+    private SoundPool soundPool;
+    private int[] hitSound = new int[5];
     private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2;
     private VectorDrawableCompat background;
     private int x, y;
@@ -34,19 +37,11 @@ public class GameField extends SurfaceView implements Runnable {
     public GameField(Context context) {
         super(context);
         thread = new Thread();
+        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        loadMusic(context);
         holder = getHolder();
         activePointers = new SparseArray<>();
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        background = VectorDrawableCompat.create(context.getResources(), R.drawable.background, null);
-        if (background != null) {
-            background.setBounds(0, 0, width, MainActivity.height);
-        }
-        player1 = new Player(R.drawable.player, context, 1);
-        player2 = new Player(R.drawable.player, context, 2);
-        puck = new Puck(R.drawable.puck, context);
-        dragPointer1 = -1;
-        dragPointer2 = -1;
+        loadGraphics(context);
         isCollision1 = false;
         isCollision2 = false;
         psec = System.currentTimeMillis();
@@ -62,6 +57,24 @@ public class GameField extends SurfaceView implements Runnable {
         player2.update();
         puck.update(sec, psec);
         psec = sec;
+    }
+
+    private void loadMusic(Context context) {
+        hitSound[0] = soundPool.load(context, R.raw.hit1, 1);
+        hitSound[1] = soundPool.load(context, R.raw.hit2, 1);
+        hitSound[2] = soundPool.load(context, R.raw.hit3, 1);
+        hitSound[3] = soundPool.load(context, R.raw.hit4, 1);
+        hitSound[4] = soundPool.load(context, R.raw.hit5, 1);
+    }
+
+    private void loadGraphics(Context context) {
+        background = VectorDrawableCompat.create(context.getResources(), R.drawable.background, null);
+        if (background != null) {
+            background.setBounds(0, 0, width, MainActivity.height);
+        }
+        player1 = new Player(R.drawable.player, context, 1);
+        player2 = new Player(R.drawable.player, context, 2);
+        puck = new Puck(R.drawable.puck, context);
     }
 
     private void checkCollision() {
@@ -97,9 +110,13 @@ public class GameField extends SurfaceView implements Runnable {
 
     private void collisionWithPuck(Player player) {
         // Увага! Нижче йде говнофізіка!
+        int random = (int) Math.round(Math.random() * 4);
+        soundPool.play(hitSound[random], 1, 1, 0, 0, 1);
         Vector relative;
         Vector collided = new Vector(0, 0);
+
         System.out.println("        Speed before collision x: " + puck.v.x + " y: " + puck.v.y);
+
         double alpha = Math.acos((player.x - puck.x) / Math.sqrt(Math.pow(puck.x - player.x, 2) + Math.pow(puck.y - player.y, 2)));
         relative = puck.v.deductVector(player.v);
         collided.y = -(relative.x * Math.cos(alpha) + relative.y * Math.sin(alpha));

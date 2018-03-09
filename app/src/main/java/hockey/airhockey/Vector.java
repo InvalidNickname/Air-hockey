@@ -19,4 +19,22 @@ class Vector {
     Vector deductVector(Vector v) {
         return new Vector(this.x - v.x, this.y - v.y);
     }
+
+    Vector addVector(Vector v) {
+        return new Vector(this.x + v.x, this.y + v.y);
+    }
+
+    Vector getProjection(Vector v, double yAxisAngle) {
+        double x, y;
+        y = v.x * Math.cos(yAxisAngle) + v.y * Math.sin(yAxisAngle);
+        x = v.x * Math.sin(yAxisAngle) + v.y * Math.cos(yAxisAngle);
+        return new Vector(x, y);
+    }
+
+    Vector multiplyVector(double multiplier) {
+        double x, y;
+        x = multiplier * this.x / 1000;
+        y = multiplier * this.y / 1000;
+        return new Vector(x, y);
+    }
 }

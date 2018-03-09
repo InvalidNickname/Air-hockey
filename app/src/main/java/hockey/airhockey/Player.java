@@ -42,6 +42,7 @@ class Player {
     void setV(long sec, long psec) {
         v.x = (x - xp + 0.) / (sec - psec);
         v.y = (y - yp + 0.) / (sec - psec);
+        v.setVector(v.x, v.y);
         xp = x;
         yp = y;
     }
