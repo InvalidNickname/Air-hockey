@@ -15,6 +15,7 @@ public class GameSettings extends AppCompatActivity {
     }
 
     public void startGame(View view) {
+        setContentView(R.layout.activity_splashscreen);
         Intent intent = new Intent(GameSettings.this, MainActivity.class);
         startActivity(intent);
         finish();

@@ -20,9 +20,9 @@ class Player {
         v = new Vector(0, 0);
         x = width / 2;
         if (num == 1) {
-            y = 2 * playerScale;
+            y = (int) (1.4 * playerScale);
         } else {
-            y = height - 2 * playerScale;
+            y = height - (int) (1.4 * playerScale);
         }
         if (drawable != null) {
             drawable.setBounds(x - playerScale, y - playerScale, x + playerScale, y + playerScale);

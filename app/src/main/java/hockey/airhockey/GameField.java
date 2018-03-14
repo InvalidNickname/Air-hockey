@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.support.graphics.drawable.VectorDrawableCompat;
@@ -27,12 +30,12 @@ public class GameField extends SurfaceView implements Runnable {
     private int[] hitSound = new int[5];
     private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2;
     private VectorDrawableCompat background;
-    private int x, y;
     private Player player1, player2;
     private Puck puck;
     private long psec;
     private SparseArray<PointF> activePointers;
-    private int dragPointer1, dragPointer2;
+    private int dragPointer1, dragPointer2, x, y, count1, count2;
+    private Paint paint;
 
     public GameField(Context context) {
         super(context);
@@ -44,7 +47,16 @@ public class GameField extends SurfaceView implements Runnable {
         loadGraphics(context);
         isCollision1 = false;
         isCollision2 = false;
+        count1 = 0;
+        count2 = 0;
         psec = System.currentTimeMillis();
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.BLUE);
+        paint.setTextSize(height / 3.5f);
+        paint.setAlpha(50);
+        Typeface base = Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf");
+        paint.setTypeface(base);
         thread.start();
     }
 
@@ -75,6 +87,19 @@ public class GameField extends SurfaceView implements Runnable {
         player1 = new Player(R.drawable.player, context, 1);
         player2 = new Player(R.drawable.player, context, 2);
         puck = new Puck(R.drawable.puck, context);
+    }
+
+    private void drawOnCanvas(Canvas canvas) {
+        canvas.drawColor(Color.WHITE);
+        background.draw(canvas);
+        Rect bounds = new Rect();
+        paint.getTextBounds(String.valueOf(count1), 0, 1, bounds);
+        canvas.drawText(String.valueOf(count1), (width - paint.measureText(String.valueOf(count1))) / 2f, (height / 1.9f + bounds.height()) / 2f, paint);
+        paint.getTextBounds(String.valueOf(count2), 0, 1, bounds);
+        canvas.drawText(String.valueOf(count2), (width - paint.measureText(String.valueOf(count2))) / 2f, (height * 1.475f + bounds.height()) / 2f, paint);
+        player1.drawPlayer(canvas);
+        player2.drawPlayer(canvas);
+        puck.drawPuck(canvas);
     }
 
     private void checkCollision() {
@@ -112,25 +137,13 @@ public class GameField extends SurfaceView implements Runnable {
         // Увага! Нижче йде говнофізіка!
         int random = (int) Math.round(Math.random() * 4);
         soundPool.play(hitSound[random], 1, 1, 0, 0, 1);
-        Vector relative;
-        Vector collided = new Vector(0, 0);
-
-        System.out.println("        Speed before collision x: " + puck.v.x + " y: " + puck.v.y);
-
+        Vector relative, collided = new Vector(0, 0);
         double alpha = Math.acos((player.x - puck.x) / Math.sqrt(Math.pow(puck.x - player.x, 2) + Math.pow(puck.y - player.y, 2)));
         relative = puck.v.deductVector(player.v);
         collided.y = -(relative.x * Math.cos(alpha) + relative.y * Math.sin(alpha));
         collided.x = relative.x * Math.sin(alpha) - Math.abs(relative.y) * Math.cos(alpha);
         puck.v.x = collided.x * Math.sin(alpha) + collided.y * Math.cos(alpha);
         puck.v.y = collided.x * Math.cos(alpha) + collided.y * Math.sin(alpha);
-
-        System.out.println("Alpha: " + alpha);
-        System.out.println("relativeVX: " + relative.x + " = " + puck.v.x + " - " + player.v.x);
-        System.out.println("relativeVY: " + relative.y + " = " + puck.v.y + " - " + player.v.y);
-        System.out.println("collidedVY: " + collided.y + " = -( " + relative.x + " * " + Math.cos(alpha) + " + " + relative.y + " * " + Math.sin(alpha) + " )");
-        System.out.println("collidedVX: " + collided.x + " = " + relative.x + " * " + Math.sin(alpha) + " + " + relative.y + " * " + Math.cos(alpha));
-        System.out.println("puck.vX: " + puck.v.x + " = " + collided.x + " * " + Math.sin(alpha) + " + " + collided.y + " * " + Math.cos(alpha));
-        System.out.println("puck.vY: " + puck.v.y + " = " + collided.x + " * " + Math.cos(alpha) + " + " + collided.y + " * " + Math.sin(alpha));
     }
 
     @Override
@@ -229,14 +242,6 @@ public class GameField extends SurfaceView implements Runnable {
             player2.y = height / 2 + playerScale;
         }
         return true;
-    }
-
-    private void drawOnCanvas(Canvas canvas) {
-        canvas.drawColor(Color.WHITE);
-        background.draw(canvas);
-        player1.drawPlayer(canvas);
-        player2.drawPlayer(canvas);
-        puck.drawPuck(canvas);
     }
 
     public void pauseDrawing() {
