@@ -4,9 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.graphics.drawable.VectorDrawableCompat;
 
-import static hockey.airhockey.MainActivity.height;
-import static hockey.airhockey.MainActivity.playerScale;
-import static hockey.airhockey.MainActivity.width;
+import static hockey.airhockey.GameActivity.height;
+import static hockey.airhockey.GameActivity.playerScale;
+import static hockey.airhockey.GameActivity.width;
 
 class Player {
 
@@ -39,9 +39,9 @@ class Player {
         drawable.setBounds(x - playerScale, y - playerScale, x + playerScale, y + playerScale);
     }
 
-    void setV(long sec, long psec) {
-        v.x = (x - xp + 0.) / (sec - psec);
-        v.y = (y - yp + 0.) / (sec - psec);
+    void setV(long delta) {
+        v.x = (x - xp + 0.) / delta;
+        v.y = (y - yp + 0.) / delta;
         v.setVector(v.x, v.y);
         xp = x;
         yp = y;

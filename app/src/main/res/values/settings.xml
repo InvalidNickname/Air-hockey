@@ -2,6 +2,7 @@
 <resources>
     <integer name="player_scale">8</integer>
     <integer name="puck_scale">9</integer>
+    <integer name="gate_height">10</integer>
     <bool name="friction">true</bool>
     <integer name="friction_value">999</integer>
 </resources>

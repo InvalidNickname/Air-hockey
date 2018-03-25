@@ -3,7 +3,7 @@ package hockey.airhockey;
 class Vector {
 
     double x, y;
-    private double angle, v;
+    double angle, v;
 
     Vector(double x, double y) {
         setVector(x, y);

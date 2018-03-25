@@ -76,14 +76,14 @@
         android:strokeColor="#FF0000"
         android:fillColor="#FF0000"
         android:strokeWidth="5" />
-    <path
+    <!--<path
         android:pathData="M675,1999.5c0,-69 -78.4,-125 -175,-125s-175,56 -175,125"
         android:strokeColor="#FF0000"
         android:fillColor="#00000000"
-        android:strokeWidth="5" />
-    <path
+        android:strokeWidth="5" />-->
+    <!--<path
         android:pathData="M325,0.5c0,69 78.4,125 175,125s175,-56 175,-125"
         android:strokeColor="#FF0000"
         android:fillColor="#00000000"
-        android:strokeWidth="5" />
+        android:strokeWidth="5" />-->
 </vector>
