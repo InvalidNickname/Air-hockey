@@ -11,6 +11,7 @@ import static hockey.airhockey.GameActivity.width;
 class Gate {
 
     int leftCorner, rightCorner;
+    private boolean isUpper;
     private VectorDrawableCompat drawable;
 
     Gate(int resId, Context context, int num) {
@@ -19,16 +20,18 @@ class Gate {
         rightCorner = 3 * width / 4;
         if (drawable != null) {
             if (num == 1) {
+                isUpper = false;
                 drawable.setBounds(leftCorner, height - gateHeight, rightCorner, height + gateHeight);
             } else {
+                isUpper = true;
                 drawable.setBounds(leftCorner, -gateHeight, rightCorner, gateHeight);
             }
         }
     }
 
-    void update(int num) {
+    void update() {
         if (drawable != null) {
-            if (num == 1) {
+            if (!isUpper) {
                 drawable.setBounds(leftCorner, height - gateHeight, rightCorner, height + gateHeight);
             } else {
                 drawable.setBounds(leftCorner, -gateHeight, rightCorner, gateHeight);

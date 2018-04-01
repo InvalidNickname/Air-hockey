@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="player_scale">8</integer>
-    <integer name="puck_scale">9</integer>
-    <integer name="gate_height">10</integer>
-    <bool name="friction">true</bool>
-    <integer name="friction_value">999</integer>
+    <integer name="player_scale">8</integer> <!-- радиус биты = высота экрана / player_scale -->
+    <integer name="puck_scale">9</integer> <!-- радиус шайбы = высота экрана / puck_scale -->
+    <integer name="gate_height">10</integer> <!-- высота ворот = высота экрана / gate_height -->
+    <bool name="friction">true</bool> <!-- есть ли трение -->
+    <integer name="friction_value">999</integer> <!-- коэффициент*1000 -->
 </resources>
