@@ -35,7 +35,11 @@ class Player {
         drawable.draw(canvas);
     }
 
-    void update() {
+    void update(long delta, boolean isGame) {
+        if (!isGame) {
+            x += v.x * delta;
+            y += v.y * delta;
+        }
         drawable.setBounds(x - playerScale, y - playerScale, x + playerScale, y + playerScale);
     }
 

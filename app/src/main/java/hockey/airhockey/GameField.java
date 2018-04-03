@@ -1,6 +1,5 @@
 package hockey.airhockey;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -29,7 +28,7 @@ public class GameField extends SurfaceView implements Runnable {
     private SurfaceHolder holder;
     private SoundPool soundPool;
     private int[] hitSound = new int[5];
-    private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2;
+    private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2, isGame;
     private VectorDrawableCompat background;
     private Player player1, player2;
     private Gate upperGate, lowerGate;
@@ -54,8 +53,7 @@ public class GameField extends SurfaceView implements Runnable {
         paint.setColor(Color.BLUE);
         paint.setTextSize(height / 3.5f);
         paint.setAlpha(50);
-        Typeface base = Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf");
-        paint.setTypeface(base);
+        paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
         loadGraphics();
         startGame();
         thread.start();
@@ -66,15 +64,20 @@ public class GameField extends SurfaceView implements Runnable {
         long sec = System.currentTimeMillis();
         delta = sec - psec;
         psec = sec;
-        player1.setV(delta);
-        player2.setV(delta);
-        checkGoal();
-        player1.update();
-        player2.update();
-        checkCollision();
+        if (isGame) {
+            checkCollision();
+            player1.setV(delta);
+            player2.setV(delta);
+            checkGoal();
+        }
+        player1.update(delta, isGame);
+        player2.update(delta, isGame);
         upperGate.update();
         lowerGate.update();
-        puck.update(delta);
+        puck.update(delta, isGame);
+        if (!isGame & length(puck.x, puck.y, width / 2, height / 2) <= puckScale / 2) {
+            startGame();
+        }
     }
 
     // проверка гола
@@ -82,21 +85,18 @@ public class GameField extends SurfaceView implements Runnable {
         if (puck.y < 0) {
             count2++;
             playGoal();
-            startGame();
         } else if (puck.y > height) {
             count1++;
             playGoal();
-            startGame();
         }
     }
 
-    // TODO анимация перемещения шайбы и бит на изначальные позиции после гола
+    // анимация перемещения шайбы и бит на изначальные позиции после гола
     private void playGoal() {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        isGame = false;
+        puck.v.setVector((width / 2 - puck.x) / 1000d, (height / 2 - puck.y) / 1000d);
+        player1.v.setVector((width / 2 - player1.x) / 1000d, (1.4 * playerScale - player1.y) / 1000d);
+        player2.v.setVector((width / 2 - player2.x) / 1000d, (height - 1.4 * playerScale - player2.y) / 1000d);
     }
 
     // начало новой игры
@@ -106,6 +106,7 @@ public class GameField extends SurfaceView implements Runnable {
         isCollision2 = false;
         psec = System.currentTimeMillis();
         loadGraphics();
+        isGame = true;
     }
 
     // загрузка звуков
@@ -146,25 +147,25 @@ public class GameField extends SurfaceView implements Runnable {
         puck.drawPuck(canvas);
     }
 
-    // провера столковения шайбы
+    private double length(double x1, double y1, double x2, double y2) {
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    }
+
+    // проверка столковения шайбы
     private void checkCollision() {
         // проверка столкновения с верхней/нижней стенкой, пролетит ли в ворота
         if (puck.x < lowerGate.rightCorner & puck.x > lowerGate.leftCorner) {
             if (puck.y < puckScale) {
-                if (Math.sqrt(Math.pow(puck.x - lowerGate.leftCorner, 2) + Math.pow(puck.y, 2)) < playerScale) {
-                    double alpha = Math.acos((puck.x - upperGate.leftCorner) / Math.sqrt(Math.pow(puck.x - upperGate.leftCorner, 2) + Math.pow(puck.y, 2)));
-                    collisionWithGates(alpha);
-                } else if (Math.sqrt(Math.pow(puck.x - lowerGate.rightCorner, 2) + Math.pow(puck.y, 2)) < playerScale) {
-                    double alpha = Math.acos((puck.x - upperGate.rightCorner) / Math.sqrt(Math.pow(puck.x - upperGate.rightCorner, 2) + Math.pow(puck.y, 2)));
-                    collisionWithGates(alpha);
+                if (length(puck.x, puck.y, upperGate.leftCorner, 0) < playerScale) {
+                    collision(new Vector(0, 0), Math.acos((puck.x - upperGate.leftCorner) / length(puck.x, puck.y, upperGate.leftCorner, 0)));
+                } else if (length(puck.x, puck.y, upperGate.rightCorner, 0) < playerScale) {
+                    collision(new Vector(0, 0), Math.acos((puck.x - upperGate.rightCorner) / length(puck.x, puck.y, upperGate.rightCorner, 0)));
                 }
             } else if (puck.y > height - puckScale) {
-                if (Math.sqrt(Math.pow(puck.x - lowerGate.leftCorner, 2) + Math.pow(puck.y - height, 2)) < playerScale) {
-                    double alpha = Math.acos((puck.x - lowerGate.leftCorner) / Math.sqrt(Math.pow(puck.x - lowerGate.leftCorner, 2) + Math.pow(puck.y - height, 2)));
-                    collisionWithGates(alpha);
-                } else if (Math.sqrt(Math.pow(puck.x - lowerGate.rightCorner, 2) + Math.pow(puck.y - height, 2)) < playerScale) {
-                    double alpha = Math.acos((puck.x - lowerGate.rightCorner) / Math.sqrt(Math.pow(puck.x - lowerGate.rightCorner, 2) + Math.pow(puck.y - height, 2)));
-                    collisionWithGates(alpha);
+                if (length(puck.x, puck.y, lowerGate.leftCorner, height) < playerScale) {
+                    collision(new Vector(0, 0), Math.acos((puck.x - lowerGate.leftCorner) / length(puck.x, puck.y, lowerGate.leftCorner, height)));
+                } else if (length(puck.x, puck.y, lowerGate.rightCorner, height) < playerScale) {
+                    collision(new Vector(0, 0), Math.acos((puck.x - lowerGate.rightCorner) / length(puck.x, puck.y, lowerGate.rightCorner, height)));
                 }
             }
         } else {
@@ -193,54 +194,41 @@ public class GameField extends SurfaceView implements Runnable {
             ply2 = player2.y + player2.v.y * delta / 5 * i;
             px = puck.x + puck.v.x * delta / 5 * i;
             py = puck.y + puck.v.y * delta / 5 * i;
-            boolean c1 = Math.sqrt(Math.pow(px - plx1, 2) + Math.pow(py - ply1, 2)) < playerScale + puckScale - 5;
-            boolean c2 = Math.sqrt(Math.pow(px - plx2, 2) + Math.pow(py - ply2, 2)) < playerScale + puckScale - 5;
-            if (c1 & !isCollision1) {
+            if ((length(px, py, plx1, ply1) < playerScale + puckScale - 5) & !isCollision1) {
                 if (ply1 <= py) {
-                    collisionWithPuck(player1, Math.acos((px - plx1) / Math.sqrt(Math.pow(px - plx1, 2) + Math.pow(py - ply1, 2))));
+                    collision(player1.v, Math.acos((px - plx1) / length(px, py, plx1, ply1)));
                 } else {
-                    collisionWithPuck(player1, Math.acos((plx1 - px) / Math.sqrt(Math.pow(px - plx1, 2) + Math.pow(py - ply1, 2))));
+                    collision(player1.v, Math.acos((plx1 - px) / length(px, py, plx1, ply1)));
                 }
                 isCollision1 = true;
             }
-            if (!c1) {
+            if (!(length(px, py, plx1, ply1) < playerScale + puckScale - 5)) {
                 isCollision1 = false;
             }
-            if (c2 & !isCollision2) {
+            if ((length(px, py, plx2, ply2) < playerScale + puckScale - 5) & !isCollision2) {
                 if (ply2 <= py) {
-                    collisionWithPuck(player2, Math.acos((px - plx2) / Math.sqrt(Math.pow(px - plx2, 2) + Math.pow(py - ply2, 2))));
+                    collision(player2.v, Math.acos((px - plx2) / length(px, py, plx2, ply2)));
                 } else {
-                    collisionWithPuck(player2, Math.acos((plx2 - px) / Math.sqrt(Math.pow(px - plx2, 2) + Math.pow(py - ply2, 2))));
+                    collision(player2.v, Math.acos((plx2 - px) / length(px, py, plx2, ply2)));
                 }
                 isCollision2 = true;
             }
-            if (!c2) {
+            if (!(length(px, py, plx2, ply2) < playerScale + puckScale - 5)) {
                 isCollision2 = false;
             }
         }
     }
 
     // столкновение биты с шайбой, alpha - угол наклона прямой, соединяющей центры шайбы и биты к прямой x
-    private void collisionWithPuck(Player player, double alpha) {
+    private void collision(Vector speed, double alpha) {
         int random = (int) Math.round(Math.random() * 4);
         soundPool.play(hitSound[random], 1, 1, 0, 0, 1);
         Vector relative, collided = new Vector(0, 0);
         // нахождение скорости шайбы относительно биты
-        relative = puck.v.deductVector(player.v);
+        relative = puck.v.deductVector(speed);
         // проецирование скорости шайбы в систему координат с наклоном прямой x на угол alpha, отражение vy
         collided.y = -(relative.x * Math.cos(alpha) + relative.y * Math.sin(alpha));
         collided.x = relative.x * Math.sin(alpha) - relative.y * Math.cos(alpha);
-        // проецирование отраженной скорости на нормальную систему координат
-        puck.v.x = collided.x * Math.sin(alpha) + collided.y * Math.cos(alpha);
-        puck.v.y = -collided.x * Math.cos(alpha) + collided.y * Math.sin(alpha);
-    }
-
-    // TODO столкновение шайбы с воротами
-    private void collisionWithGates(double alpha) {
-        Vector collided = new Vector(0, 0);
-        // проецирование скорости шайбы в систему координат с наклоном прямой x на угол alpha, отражение vy
-        collided.y = -(puck.v.x * Math.cos(alpha) + puck.v.y * Math.sin(alpha));
-        collided.x = puck.v.x * Math.sin(alpha) - puck.v.y * Math.cos(alpha);
         // проецирование отраженной скорости на нормальную систему координат
         puck.v.x = collided.x * Math.sin(alpha) + collided.y * Math.cos(alpha);
         puck.v.y = -collided.x * Math.cos(alpha) + collided.y * Math.sin(alpha);
@@ -273,7 +261,6 @@ public class GameField extends SurfaceView implements Runnable {
         return playerX;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int pointerIndex = event.getActionIndex();
@@ -302,7 +289,7 @@ public class GameField extends SurfaceView implements Runnable {
                     pointerIndex = i;
                     pointerId = event.getPointerId(pointerIndex);
                     PointF point = activePointers.get(event.getPointerId(i));
-                    if (point != null) {
+                    if (point != null & isGame) {
                         point.x = event.getX(i);
                         point.y = event.getY(i);
                         if (isDragging1 & (pointerId == dragPointer1)) {
@@ -331,19 +318,27 @@ public class GameField extends SurfaceView implements Runnable {
                 }
                 break;
         }
-        player1.x = checkX(player1.x);
-        if (player1.y < playerScale) {
-            player1.y = playerScale;
-        } else if (player1.y > height / 2 - playerScale) {
-            player1.y = height / 2 - playerScale;
+        if (isGame) {
+            player1.x = checkX(player1.x);
+            if (player1.y < playerScale) {
+                player1.y = playerScale;
+            } else if (player1.y > height / 2 - playerScale) {
+                player1.y = height / 2 - playerScale;
+            }
+            player2.x = checkX(player2.x);
+            if (player2.y > height - playerScale) {
+                player2.y = height - playerScale;
+            } else if (player2.y < height / 2 + playerScale) {
+                player2.y = height / 2 + playerScale;
+            }
         }
-        player2.x = checkX(player2.x);
-        if (player2.y > height - playerScale) {
-            player2.y = height - playerScale;
-        } else if (player2.y < height / 2 + playerScale) {
-            player2.y = height / 2 + playerScale;
-        }
+        performClick();
         return true;
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     public void pauseDrawing() {
