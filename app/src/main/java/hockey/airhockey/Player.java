@@ -4,9 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.graphics.drawable.VectorDrawableCompat;
 
-import static hockey.airhockey.GameActivity.height;
-import static hockey.airhockey.GameActivity.playerScale;
-import static hockey.airhockey.GameActivity.width;
+import static hockey.airhockey.MainActivity.height;
+import static hockey.airhockey.MainActivity.playerScale;
+import static hockey.airhockey.MainActivity.width;
 
 class Player {
 
@@ -35,8 +35,8 @@ class Player {
         drawable.draw(canvas);
     }
 
-    void update(long delta, boolean isGame) {
-        if (!isGame) {
+    void update(long delta, boolean isAnimation) {
+        if (isAnimation) {
             x += v.x * delta;
             y += v.y * delta;
         }

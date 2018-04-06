@@ -4,11 +4,11 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.graphics.drawable.VectorDrawableCompat;
 
-import static hockey.airhockey.GameActivity.friction;
-import static hockey.airhockey.GameActivity.frictionValue;
-import static hockey.airhockey.GameActivity.height;
-import static hockey.airhockey.GameActivity.puckScale;
-import static hockey.airhockey.GameActivity.width;
+import static hockey.airhockey.MainActivity.friction;
+import static hockey.airhockey.MainActivity.frictionValue;
+import static hockey.airhockey.MainActivity.height;
+import static hockey.airhockey.MainActivity.puckScale;
+import static hockey.airhockey.MainActivity.width;
 
 class Puck {
 
@@ -26,11 +26,11 @@ class Puck {
         }
     }
 
-    void update(long delta, boolean isGame) {
+    void update(long delta, boolean isAnimation) {
         v.setVector(v.x, v.y);
         x += v.x * delta;
         y += v.y * delta;
-        if (friction & isGame) {
+        if (friction & !isAnimation) {
             v = v.multiplyVector(frictionValue);
         }
         drawable.setBounds(x - puckScale, y - puckScale, x + puckScale, y + puckScale);

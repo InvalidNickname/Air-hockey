@@ -4,9 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.graphics.drawable.VectorDrawableCompat;
 
-import static hockey.airhockey.GameActivity.gateHeight;
-import static hockey.airhockey.GameActivity.height;
-import static hockey.airhockey.GameActivity.width;
+import static hockey.airhockey.MainActivity.gateHeight;
+import static hockey.airhockey.MainActivity.height;
+import static hockey.airhockey.MainActivity.width;
 
 class Gate {
 
@@ -21,10 +21,10 @@ class Gate {
         if (drawable != null) {
             if (num == 1) {
                 isUpper = false;
-                drawable.setBounds(leftCorner, height - gateHeight, rightCorner, height + gateHeight);
+                drawable.setBounds(leftCorner, height - gateHeight, rightCorner, height);
             } else {
                 isUpper = true;
-                drawable.setBounds(leftCorner, -gateHeight, rightCorner, gateHeight);
+                drawable.setBounds(leftCorner, 0, rightCorner, gateHeight);
             }
         }
     }
@@ -32,9 +32,9 @@ class Gate {
     void update() {
         if (drawable != null) {
             if (!isUpper) {
-                drawable.setBounds(leftCorner, height - gateHeight, rightCorner, height + gateHeight);
+                drawable.setBounds(leftCorner, height - gateHeight, rightCorner, height);
             } else {
-                drawable.setBounds(leftCorner, -gateHeight, rightCorner, gateHeight);
+                drawable.setBounds(leftCorner, 0, rightCorner, gateHeight);
             }
         }
     }
