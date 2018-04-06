@@ -3,6 +3,7 @@ package hockey.airhockey;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         start = findViewById(R.id.start);
         settings = findViewById(R.id.settings);
         main = findViewById(R.id.main);
+        main.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.background, null));
         up = AnimationUtils.loadAnimation(this, R.anim.go_up);
         down = AnimationUtils.loadAnimation(this, R.anim.go_down);
         drawGates();
@@ -46,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private void drawGates() {
         upperGate = new View(this);
         lowerGate = new View(this);
-        upperGate.setBackground(getResources().getDrawable(R.drawable.upper_gate));
-        lowerGate.setBackground(getResources().getDrawable(R.drawable.lower_gate));
+        upperGate.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.upper_gate, null));
+        lowerGate.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.lower_gate, null));
         ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams(width / 2, gateHeight);
         upperParams.leftToLeft = R.id.main;
         upperParams.rightToRight = R.id.main;
