@@ -56,7 +56,6 @@ public class GameField extends SurfaceView implements Runnable {
         paint.setTextSize(height / 3.5f);
         paint.setAlpha(50);
         paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
-        loadGraphics();
         startGame();
         thread.start();
     }
@@ -71,9 +70,9 @@ public class GameField extends SurfaceView implements Runnable {
         }
         if (isAnimation & time >= goalStopTime & !isSpeedSet) {
             isSpeedSet = true;
-            puck.v.setVector((width / 2d - puck.x) / 1000d, (height / 2d - puck.y) / 1000d);
-            player1.v.setVector((width / 2 - player1.x) / 1000d, (1.4 * playerScale - player1.y) / 1000d);
-            player2.v.setVector((width / 2 - player2.x) / 1000d, (height - 1.4 * playerScale - player2.y) / 1000d);
+            puck.v.setVector((width / 2d - puck.x) / goalStopTime, (height / 2d - puck.y) / goalStopTime);
+            player1.v.setVector((width / 2 - player1.x) / goalStopTime, (1.4 * playerScale - player1.y) / goalStopTime);
+            player2.v.setVector((width / 2 - player2.x) / goalStopTime, (height - 1.4 * playerScale - player2.y) / goalStopTime);
         }
         if (!isAnimation) {
             checkCollision();
@@ -83,8 +82,6 @@ public class GameField extends SurfaceView implements Runnable {
         }
         player1.update(delta, isAnimation);
         player2.update(delta, isAnimation);
-        lowerGate.update();
-        upperGate.update();
         puck.update(delta, isAnimation);
         if (isAnimation & length(puck.x, puck.y, width / 2, height / 2) <= puckScale / 2) {
             startGame();
@@ -148,7 +145,6 @@ public class GameField extends SurfaceView implements Runnable {
 
     // рисование
     private void drawOnCanvas(Canvas canvas) {
-        canvas.drawColor(Color.WHITE);
         background.draw(canvas);
         lowerGate.drawGate(canvas);
         upperGate.drawGate(canvas);
