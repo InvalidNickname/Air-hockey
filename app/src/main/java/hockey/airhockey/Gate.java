@@ -39,7 +39,7 @@ class Gate {
         }
     }
 
-    void drawGate(Canvas canvas) {
+    void draw(Canvas canvas) {
         drawable.draw(canvas);
     }
 

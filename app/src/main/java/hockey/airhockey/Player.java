@@ -10,8 +10,8 @@ import static hockey.airhockey.MainActivity.width;
 
 class Player {
 
-    int x, y;
-    private int xp, yp;
+    double x, y;
+    private double xp, yp;
     Vector v;
     private VectorDrawableCompat drawable;
 
@@ -25,13 +25,13 @@ class Player {
             y = height - (int) (1.4 * playerScale);
         }
         if (drawable != null) {
-            drawable.setBounds(x - playerScale, y - playerScale, x + playerScale, y + playerScale);
+            drawable.setBounds((int) x - playerScale, (int) y - playerScale, (int) x + playerScale, (int) y + playerScale);
         }
         xp = x;
         yp = y;
     }
 
-    void drawPlayer(Canvas canvas) {
+    void draw(Canvas canvas) {
         drawable.draw(canvas);
     }
 
@@ -40,12 +40,12 @@ class Player {
             x += v.x * delta;
             y += v.y * delta;
         }
-        drawable.setBounds(x - playerScale, y - playerScale, x + playerScale, y + playerScale);
+        drawable.setBounds((int) x - playerScale, (int) y - playerScale, (int) x + playerScale, (int) y + playerScale);
     }
 
     void setV(long delta) {
-        v.x = (x - xp + 0.) / delta;
-        v.y = (y - yp + 0.) / delta;
+        v.x = (x - xp) / delta;
+        v.y = (y - yp) / delta;
         v.setVector(v.x, v.y);
         xp = x;
         yp = y;

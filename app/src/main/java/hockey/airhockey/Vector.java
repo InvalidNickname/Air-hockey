@@ -3,7 +3,6 @@ package hockey.airhockey;
 class Vector {
 
     double x, y;
-    double angle, v;
 
     Vector(double x, double y) {
         setVector(x, y);
@@ -12,8 +11,6 @@ class Vector {
     void setVector(double x, double y) {
         this.x = x;
         this.y = y;
-        this.v = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-        this.angle = Math.acos(x / v);
     }
 
     Vector deductVector(Vector v) {

@@ -12,7 +12,7 @@ import static hockey.airhockey.MainActivity.width;
 
 class Puck {
 
-    int x, y;
+    double x, y;
     Vector v;
     private VectorDrawableCompat drawable;
 
@@ -22,21 +22,23 @@ class Puck {
         x = width / 2;
         y = height / 2;
         if (drawable != null) {
-            drawable.setBounds(x - puckScale, y - puckScale, x + puckScale, y + puckScale);
+            drawable.setBounds((int) x - puckScale, (int) y - puckScale, (int) x + puckScale, (int) y + puckScale);
         }
     }
 
     void update(long delta, boolean isAnimation) {
-        v.setVector(v.x, v.y);
+        if (!isAnimation) {
+            v.setVector(v.x, v.y);
+        }
         x += v.x * delta;
         y += v.y * delta;
         if (friction & !isAnimation) {
             v = v.multiplyVector(frictionValue);
         }
-        drawable.setBounds(x - puckScale, y - puckScale, x + puckScale, y + puckScale);
+        drawable.setBounds((int) x - puckScale, (int) y - puckScale, (int) x + puckScale, (int) y + puckScale);
     }
 
-    void drawPuck(Canvas canvas) {
+    void draw(Canvas canvas) {
         drawable.draw(canvas);
     }
 }

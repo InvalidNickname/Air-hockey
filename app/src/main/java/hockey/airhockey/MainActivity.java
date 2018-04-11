@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     Animation up, down;
     View upperGate, lowerGate;
     ConstraintLayout main;
-    static int width, height, playerScale, puckScale, frictionValue, gateHeight, goalStopTime, startAnimStopTime;
+    static int width, height, playerScale, puckScale, frictionValue, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers;
     static boolean friction;
 
     @Override
@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         goalStopTime = getResources().getInteger(R.integer.goal_stop);
         startAnimStopTime = getResources().getInteger(R.integer.start_anim_stop);
         frictionValue = getResources().getInteger(R.integer.friction_value);
+        numberOfPucks = getResources().getInteger(R.integer.number_of_pucks) - 1;
+        numberOfPlayers = getResources().getInteger(R.integer.number_of_players) - 1;
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         start = findViewById(R.id.start);

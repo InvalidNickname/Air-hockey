@@ -16,6 +16,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import static hockey.airhockey.GameCustomField.player1Chosen;
+import static hockey.airhockey.GameCustomField.player2Chosen;
+import static hockey.airhockey.GameCustomField.playerArray;
+import static hockey.airhockey.GameCustomField.puckArray;
+import static hockey.airhockey.GameCustomField.puckChosen;
 import static hockey.airhockey.MainActivity.goalStopTime;
 import static hockey.airhockey.MainActivity.height;
 import static hockey.airhockey.MainActivity.playerScale;
@@ -30,12 +35,12 @@ public class GameField extends SurfaceView implements Runnable {
     private SoundPool soundPool;
     private int[] hitSound = new int[5];
     private int goalSound;
-    private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, isSpeedSet;
+    private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation;
     private VectorDrawableCompat background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
     private Puck puck;
-    private long psec, time;
+    private long psec;
     long delta;
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, x, y, count1, count2;
@@ -65,15 +70,6 @@ public class GameField extends SurfaceView implements Runnable {
         long sec = System.currentTimeMillis();
         delta = sec - psec;
         psec = sec;
-        if (isAnimation) {
-            time += delta;
-        }
-        if (isAnimation & time >= goalStopTime & !isSpeedSet) {
-            isSpeedSet = true;
-            puck.v.setVector((width / 2d - puck.x) / goalStopTime, (height / 2d - puck.y) / goalStopTime);
-            player1.v.setVector((width / 2 - player1.x) / goalStopTime, (1.4 * playerScale - player1.y) / goalStopTime);
-            player2.v.setVector((width / 2 - player2.x) / goalStopTime, (height - 1.4 * playerScale - player2.y) / goalStopTime);
-        }
         if (!isAnimation) {
             checkCollision();
             player1.setV(delta);
@@ -102,11 +98,10 @@ public class GameField extends SurfaceView implements Runnable {
     // анимация перемещения шайбы и бит на изначальные позиции после гола
     private void playGoal() {
         isAnimation = true;
-        time = 0;
         soundPool.play(goalSound, 1, 1, 0, 0, 1);
-        puck.v.setVector(0, 0);
-        player2.v.setVector(0, 0);
-        player1.v.setVector(0, 0);
+        puck.v.setVector((width / 2d - puck.x) / goalStopTime, (height / 2d - puck.y) / goalStopTime);
+        player1.v.setVector((width / 2d - player1.x) / goalStopTime, (1.4 * playerScale - player1.y) / goalStopTime);
+        player2.v.setVector((width / 2d - player2.x) / goalStopTime, (height - 1.4 * playerScale - player2.y) / goalStopTime);
     }
 
     // начало новой игры
@@ -117,7 +112,6 @@ public class GameField extends SurfaceView implements Runnable {
         psec = System.currentTimeMillis();
         loadGraphics();
         isAnimation = false;
-        isSpeedSet = false;
     }
 
     // загрузка звуков
@@ -136,9 +130,9 @@ public class GameField extends SurfaceView implements Runnable {
         if (background != null) {
             background.setBounds(0, 0, width, height);
         }
-        player1 = new Player(R.drawable.player, context, 1);
-        player2 = new Player(R.drawable.player, context, 2);
-        puck = new Puck(R.drawable.puck, context);
+        player1 = new Player(playerArray[player1Chosen], context, 1);
+        player2 = new Player(playerArray[player2Chosen], context, 2);
+        puck = new Puck(puckArray[puckChosen], context);
         lowerGate = new Gate(R.drawable.lower_gate, context, 1);
         upperGate = new Gate(R.drawable.upper_gate, context, 2);
     }
@@ -146,16 +140,16 @@ public class GameField extends SurfaceView implements Runnable {
     // рисование
     private void drawOnCanvas(Canvas canvas) {
         background.draw(canvas);
-        lowerGate.drawGate(canvas);
-        upperGate.drawGate(canvas);
+        lowerGate.draw(canvas);
+        upperGate.draw(canvas);
         Rect bounds = new Rect();
         paint.getTextBounds(String.valueOf(count1), 0, 1, bounds);
         canvas.drawText(String.valueOf(count1), (width - paint.measureText(String.valueOf(count1))) / 2f, (height / 1.9f + bounds.height()) / 2f, paint);
         paint.getTextBounds(String.valueOf(count2), 0, 1, bounds);
         canvas.drawText(String.valueOf(count2), (width - paint.measureText(String.valueOf(count2))) / 2f, (height * 1.475f + bounds.height()) / 2f, paint);
-        player1.drawPlayer(canvas);
-        player2.drawPlayer(canvas);
-        puck.drawPuck(canvas);
+        player1.draw(canvas);
+        player2.draw(canvas);
+        puck.draw(canvas);
     }
 
     private double length(double x1, double y1, double x2, double y2) {
@@ -260,12 +254,12 @@ public class GameField extends SurfaceView implements Runnable {
     }
 
     // определяет, находится ли точка внутри биты
-    private boolean isInside(int playerX, int playerY) {
+    private boolean isInside(double playerX, double playerY) {
         return Math.sqrt(Math.pow(playerX - x, 2) + Math.pow(playerY - y, 2)) < playerScale;
     }
 
     // не дает сдвинуть биту за вертикальные стенки
-    private int checkX(int playerX) {
+    private double checkX(double playerX) {
         if (playerX < playerScale) {
             playerX = playerScale;
         } else if (playerX > width - playerScale) {
