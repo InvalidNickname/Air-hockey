@@ -22,7 +22,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
     static int player1Chosen, puckChosen, player2Chosen;
     private Context context;
     private SurfaceHolder holder;
-    private boolean isDrawing, isSpeedSet;
+    private boolean isDrawing, isSpeedSet, animStop;
     private VectorDrawableCompat background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
@@ -48,6 +48,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
         holder = getHolder();
         loadGraphics();
         isSpeedSet = false;
+        animStop = false;
         thread.start();
     }
 
@@ -65,10 +66,11 @@ public class GameCustomField extends SurfaceView implements Runnable {
         player1.update(delta, true);
         player2.update(delta, true);
         puck.update(delta, true);
-        if (puck.x <= width / 2 + puckScale / 2) {
+        if (puck.x <= width / 2 + puckScale / 2 & !animStop) {
             player1 = new Player(playerArray[player1Chosen], context, 1);
             player2 = new Player(playerArray[player2Chosen], context, 2);
             puck = new Puck(puckArray[puckChosen], context);
+            animStop = true;
         }
     }
 
@@ -99,12 +101,14 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private void drawOnCanvas(Canvas canvas) {
         background.draw(canvas);
         start.draw(canvas);
-        player1Left.draw(canvas);
-        player1Right.draw(canvas);
-        player2Left.draw(canvas);
-        player2Right.draw(canvas);
-        puckRight.draw(canvas);
-        puckLeft.draw(canvas);
+        if (animStop) {
+            player1Left.draw(canvas);
+            player1Right.draw(canvas);
+            player2Left.draw(canvas);
+            player2Right.draw(canvas);
+            puckRight.draw(canvas);
+            puckLeft.draw(canvas);
+        }
         lowerGate.draw(canvas);
         upperGate.draw(canvas);
         player1.draw(canvas);
@@ -119,6 +123,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
             int y = (int) event.getY();
             if (start.isClicked(x, y)) {
                 Intent intent = new Intent(context, GameActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 context.startActivity(intent);
             }
             if (puckLeft.isClicked(x, y)) {
@@ -142,22 +147,20 @@ public class GameCustomField extends SurfaceView implements Runnable {
                     player1Chosen = numberOfPlayers;
                 }
                 player1 = new Player(playerArray[player1Chosen], context, 1);
-                System.out.println(puckChosen);
             }
             if (player1Right.isClicked(x, y)) {
                 player1Chosen++;
                 if (player1Chosen > numberOfPlayers) {
                     player1Chosen = 0;
                 }
-                player1 = new Player(playerArray[player1Chosen], context, 2);
+                player1 = new Player(playerArray[player1Chosen], context, 1);
             }
             if (player2Left.isClicked(x, y)) {
                 player2Chosen -= 1;
                 if (player2Chosen < 0) {
                     player2Chosen = numberOfPlayers;
                 }
-                player2 = new Player(playerArray[player2Chosen], context, 1);
-                System.out.println(puckChosen);
+                player2 = new Player(playerArray[player2Chosen], context, 2);
             }
             if (player2Right.isClicked(x, y)) {
                 player2Chosen++;

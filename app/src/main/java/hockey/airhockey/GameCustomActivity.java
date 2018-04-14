@@ -1,5 +1,6 @@
 package hockey.airhockey;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
@@ -14,6 +15,7 @@ public class GameCustomActivity extends AppCompatActivity {
         gameCustomField = new GameCustomField(this);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(gameCustomField);
+        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -26,5 +28,12 @@ public class GameCustomActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         gameCustomField.resumeDrawing();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(GameCustomActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

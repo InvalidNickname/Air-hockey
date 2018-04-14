@@ -22,6 +22,7 @@ import static hockey.airhockey.GameCustomField.playerArray;
 import static hockey.airhockey.GameCustomField.puckArray;
 import static hockey.airhockey.GameCustomField.puckChosen;
 import static hockey.airhockey.MainActivity.goalStopTime;
+import static hockey.airhockey.MainActivity.goalThreshold;
 import static hockey.airhockey.MainActivity.height;
 import static hockey.airhockey.MainActivity.playerScale;
 import static hockey.airhockey.MainActivity.puckScale;
@@ -74,6 +75,7 @@ public class GameField extends SurfaceView implements Runnable {
             checkCollision();
             player1.setV(delta);
             player2.setV(delta);
+            checkWinner();
             checkGoal();
         }
         player1.update(delta, isAnimation);
@@ -92,6 +94,15 @@ public class GameField extends SurfaceView implements Runnable {
         } else if (puck.y > height) {
             count1++;
             playGoal();
+        }
+    }
+
+    // проверка победителя
+    private void checkWinner() {
+        if (count1 > goalThreshold) {
+
+        } else if (count2 > goalThreshold) {
+
         }
     }
 
@@ -191,14 +202,14 @@ public class GameField extends SurfaceView implements Runnable {
             puck.v.x = -puck.v.x;
         }
         // проверка столкновения с битой
-        for (int i = 1; i < 5; i++) {
+        for (int i = 0; i < 2; i++) {
             double plx1, ply1, plx2, ply2, px, py;
-            plx1 = player1.x + player1.v.x * delta / 5 * i;
-            ply1 = player1.y + player1.v.y * delta / 5 * i;
-            plx2 = player2.x + player2.v.x * delta / 5 * i;
-            ply2 = player2.y + player2.v.y * delta / 5 * i;
-            px = puck.x + puck.v.x * delta / 5 * i;
-            py = puck.y + puck.v.y * delta / 5 * i;
+            plx1 = player1.x + player1.v.x * delta / 6 * i;
+            ply1 = player1.y + player1.v.y * delta / 6 * i;
+            plx2 = player2.x + player2.v.x * delta / 6 * i;
+            ply2 = player2.y + player2.v.y * delta / 6 * i;
+            px = puck.x + puck.v.x * delta / 6 * i;
+            py = puck.y + puck.v.y * delta / 6 * i;
             if ((length(px, py, plx1, ply1) < playerScale + puckScale - 5) & !isCollision1) {
                 if (ply1 <= py) {
                     collision(player1.v, Math.acos((px - plx1) / length(px, py, plx1, ply1)), true);

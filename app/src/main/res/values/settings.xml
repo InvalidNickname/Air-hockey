@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="player_scale">9</integer> <!-- радиус биты = высота экрана / player_scale -->
-    <integer name="puck_scale">10</integer> <!-- радиус шайбы = высота экрана / puck_scale -->
+    <integer name="player_scale">10</integer> <!-- радиус биты = высота экрана / player_scale -->
+    <integer name="puck_scale">11</integer> <!-- радиус шайбы = высота экрана / puck_scale -->
     <integer name="gate_height">10</integer> <!-- высота ворот = высота экрана / gate_height -->
     <bool name="friction">true</bool> <!-- есть ли трение -->
-    <integer name="friction_value">999</integer> <!-- коэффициент*1000 -->
+    <integer name="friction_value">980</integer> <!-- коэффициент*1000 -->
     <integer name="goal_stop">1000</integer> <!-- время заморозки на анимацию после гола -->
     <integer name="start_anim_stop">700</integer> <!-- анимация перед началом игры -->
     <integer name="number_of_pucks">2</integer> <!-- кол-во изображений шайбы -->
     <integer name="number_of_players">2</integer> <!-- кол-во изображений биты -->
+    <integer name="goal_threshold">10</integer> <!-- до скольки очков идёт игра -->
 </resources>

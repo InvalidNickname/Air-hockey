@@ -20,7 +20,8 @@ public class MainActivity extends AppCompatActivity {
     Animation up, down;
     View upperGate, lowerGate;
     ConstraintLayout main;
-    static int width, height, playerScale, puckScale, frictionValue, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers;
+    static int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers, goalThreshold;
+    static double frictionValue;
     static boolean friction;
 
     @Override
@@ -32,13 +33,15 @@ public class MainActivity extends AppCompatActivity {
         puckScale = getResources().getDisplayMetrics().widthPixels / getResources().getInteger(R.integer.puck_scale);
         gateHeight = getResources().getDisplayMetrics().widthPixels / getResources().getInteger(R.integer.gate_height);
         friction = getResources().getBoolean(R.bool.friction);
+        goalThreshold = getResources().getInteger(R.integer.goal_threshold);
         goalStopTime = getResources().getInteger(R.integer.goal_stop);
         startAnimStopTime = getResources().getInteger(R.integer.start_anim_stop);
-        frictionValue = getResources().getInteger(R.integer.friction_value);
+        frictionValue = getResources().getInteger(R.integer.friction_value) / 1000d;
         numberOfPucks = getResources().getInteger(R.integer.number_of_pucks) - 1;
         numberOfPlayers = getResources().getInteger(R.integer.number_of_players) - 1;
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+        overridePendingTransition(0, 0);
         start = findViewById(R.id.start);
         settings = findViewById(R.id.settings);
         main = findViewById(R.id.main);
@@ -53,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         lowerGate = new View(this);
         upperGate.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.upper_gate, null));
         lowerGate.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.lower_gate, null));
-        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams(width / 2, gateHeight);
+        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
         upperParams.leftToLeft = R.id.main;
         upperParams.rightToRight = R.id.main;
         upperParams.topToTop = R.id.main;
@@ -62,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         upperParams.verticalBias = 0;
         upperGate.setLayoutParams(upperParams);
         main.addView(upperGate);
-        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams(width / 2, gateHeight);
+        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
         lowerParams.leftToLeft = R.id.main;
         lowerParams.rightToRight = R.id.main;
         lowerParams.topToTop = R.id.main;
@@ -97,5 +100,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openSettings(View view) {
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

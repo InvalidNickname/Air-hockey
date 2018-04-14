@@ -7,6 +7,7 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import static hockey.airhockey.MainActivity.friction;
 import static hockey.airhockey.MainActivity.frictionValue;
 import static hockey.airhockey.MainActivity.height;
+import static hockey.airhockey.MainActivity.playerScale;
 import static hockey.airhockey.MainActivity.puckScale;
 import static hockey.airhockey.MainActivity.width;
 
@@ -29,6 +30,9 @@ class Puck {
     void update(long delta, boolean isAnimation) {
         if (!isAnimation) {
             v.setVector(v.x, v.y);
+            if (v.v * delta > playerScale * 2) {
+                v.setVector(playerScale * 2 * v.cos / delta, playerScale * 2 * v.sin / delta);
+            }
         }
         x += v.x * delta;
         y += v.y * delta;

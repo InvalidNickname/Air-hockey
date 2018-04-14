@@ -2,7 +2,7 @@ package hockey.airhockey;
 
 class Vector {
 
-    double x, y;
+    double x, y, v, cos, sin;
 
     Vector(double x, double y) {
         setVector(x, y);
@@ -11,6 +11,9 @@ class Vector {
     void setVector(double x, double y) {
         this.x = x;
         this.y = y;
+        v = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        cos = x / v;
+        sin = y / v;
     }
 
     Vector deductVector(Vector v) {
@@ -19,8 +22,8 @@ class Vector {
 
     Vector multiplyVector(double multiplier) {
         double x, y;
-        x = multiplier * this.x / 1000;
-        y = multiplier * this.y / 1000;
+        x = multiplier * this.x;
+        y = multiplier * this.y;
         return new Vector(x, y);
     }
 }

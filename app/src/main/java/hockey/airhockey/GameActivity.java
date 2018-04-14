@@ -15,6 +15,7 @@ public class GameActivity extends AppCompatActivity {
         gameField = new GameField(this);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(gameField);
+        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -27,5 +28,9 @@ public class GameActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         gameField.resumeDrawing();
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 }
