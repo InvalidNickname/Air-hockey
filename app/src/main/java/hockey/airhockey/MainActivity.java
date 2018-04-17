@@ -3,13 +3,13 @@ package hockey.airhockey;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import static android.view.View.GONE;
 
@@ -18,8 +18,6 @@ public class MainActivity extends AppCompatActivity {
 
     Button start, settings;
     Animation up, down;
-    View upperGate, lowerGate;
-    ConstraintLayout main;
     static int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers, goalThreshold;
     static double frictionValue;
     static boolean friction;
@@ -44,18 +42,14 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         start = findViewById(R.id.start);
         settings = findViewById(R.id.settings);
-        main = findViewById(R.id.main);
-        main.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.background, null));
         up = AnimationUtils.loadAnimation(this, R.anim.go_up);
         down = AnimationUtils.loadAnimation(this, R.anim.go_down);
         drawGates();
     }
 
     private void drawGates() {
-        upperGate = new View(this);
-        lowerGate = new View(this);
-        upperGate.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.upper_gate, null));
-        lowerGate.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.lower_gate, null));
+        ImageView upperGate = findViewById(R.id.upper_gate);
+        ImageView lowerGate = findViewById(R.id.lower_gate);
         ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
         upperParams.leftToLeft = R.id.main;
         upperParams.rightToRight = R.id.main;
@@ -64,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         upperParams.topMargin = -100;
         upperParams.verticalBias = 0;
         upperGate.setLayoutParams(upperParams);
-        main.addView(upperGate);
         ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
         lowerParams.leftToLeft = R.id.main;
         lowerParams.rightToRight = R.id.main;
@@ -73,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         lowerParams.bottomMargin = -100;
         lowerParams.verticalBias = 1;
         lowerGate.setLayoutParams(lowerParams);
-        main.addView(lowerGate);
     }
 
     public void startGame(View view) {

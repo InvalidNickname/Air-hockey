@@ -1,6 +1,7 @@
 package hockey.airhockey;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -99,10 +100,14 @@ public class GameField extends SurfaceView implements Runnable {
 
     // проверка победителя
     private void checkWinner() {
-        if (count1 > goalThreshold) {
-
-        } else if (count2 > goalThreshold) {
-
+        if (count1 >= goalThreshold) {
+            Intent intent = new Intent(context, WinActivity.class);
+            intent.putExtra("winner", 1);
+            context.startActivity(intent);
+        } else if (count2 >= goalThreshold) {
+            Intent intent = new Intent(context, WinActivity.class);
+            intent.putExtra("winner", 2);
+            context.startActivity(intent);
         }
     }
 
