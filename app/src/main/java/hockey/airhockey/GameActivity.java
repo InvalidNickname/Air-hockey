@@ -7,7 +7,6 @@ import android.view.WindowManager;
 public class GameActivity extends AppCompatActivity {
 
     GameField gameField;
-    public static final String TAG = "MAIN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

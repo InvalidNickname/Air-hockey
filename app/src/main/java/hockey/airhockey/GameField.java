@@ -11,7 +11,6 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.support.graphics.drawable.VectorDrawableCompat;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -369,7 +368,7 @@ public class GameField extends SurfaceView implements Runnable {
         try {
             thread.join();
         } catch (InterruptedException e) {
-            Log.e(GameActivity.TAG, e.getMessage());
+            e.printStackTrace();
         }
     }
 

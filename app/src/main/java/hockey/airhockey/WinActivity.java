@@ -24,7 +24,8 @@ public class WinActivity extends AppCompatActivity {
         lowerBlocker = findViewById(R.id.lowerBlocker);
         Intent intent = getIntent();
         fade = AnimationUtils.loadAnimation(this, R.anim.fade);
-        if (intent.getIntExtra("winner", 0) == 1) {
+        int winner = intent.getIntExtra("winner", 0);
+        if (winner == 1) {
             upperBlocker.setImageAlpha(0);
             fade.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -65,6 +66,12 @@ public class WinActivity extends AppCompatActivity {
     public void onBackPressed() {
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
+    }
+
     public void goToMenu(View view) {
         Intent intent = new Intent(WinActivity.this, MainActivity.class);
         startActivity(intent);
@@ -72,5 +79,8 @@ public class WinActivity extends AppCompatActivity {
     }
 
     public void restartGame(View view) {
+        Intent intent = new Intent(WinActivity.this, GameCustomActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

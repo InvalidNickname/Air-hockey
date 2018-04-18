@@ -76,32 +76,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/win"
-            app:layout_constraintBottom_toTopOf="@id/button"
+            android:textSize="@dimen/win_text_size"
+            app:layout_constraintBottom_toTopOf="@id/menuButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/menuButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/menu"
             android:onClick="goToMenu"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/button2"
+            app:layout_constraintEnd_toStartOf="@id/restartButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/winText" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/restartButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/restart"
             android:onClick="restartGame"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/button"
-            app:layout_constraintTop_toTopOf="@id/button"
+            app:layout_constraintStart_toEndOf="@id/menuButton"
+            app:layout_constraintTop_toTopOf="@id/menuButton"
             app:layout_constraintVertical_bias="0.0" />
 
     </android.support.constraint.ConstraintLayout>
