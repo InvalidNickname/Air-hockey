@@ -11,8 +11,8 @@ import static hockey.airhockey.MainActivity.width;
 class Player {
 
     double x, y;
-    private double xp, yp;
     Vector v;
+    private double xp, yp;
     private VectorDrawableCompat drawable;
 
     Player(int resId, Context context, int num) {

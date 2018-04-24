@@ -18,8 +18,10 @@ import static hockey.airhockey.MainActivity.width;
 
 public class GameCustomField extends SurfaceView implements Runnable {
 
-    private Thread thread;
     static int player1Chosen, puckChosen, player2Chosen;
+    static int[] puckArray, playerArray;
+    long delta;
+    private Thread thread;
     private Context context;
     private SurfaceHolder holder;
     private boolean isDrawing, isSpeedSet, animStop;
@@ -28,9 +30,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private Gate lowerGate, upperGate;
     private Puck puck;
     private long psec;
-    static int[] puckArray, playerArray;
     private Button start, puckLeft, puckRight, player1Left, player1Right, player2Left, player2Right;
-    long delta;
 
     public GameCustomField(Context context) {
         super(context);

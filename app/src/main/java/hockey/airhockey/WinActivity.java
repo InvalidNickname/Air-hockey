@@ -1,17 +1,22 @@
 package hockey.airhockey;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class WinActivity extends AppCompatActivity {
 
     ImageView upperBlocker, lowerBlocker;
+    TextView winText;
+    Button menu, restart;
     Animation fade;
 
     @Override
@@ -22,6 +27,12 @@ public class WinActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         upperBlocker = findViewById(R.id.upperBlocker);
         lowerBlocker = findViewById(R.id.lowerBlocker);
+        winText = findViewById(R.id.winText);
+        menu = findViewById(R.id.menuButton);
+        restart = findViewById(R.id.restartButton);
+        winText.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/aldrich.ttf"));
+        menu.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/aldrich.ttf"));
+        restart.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/aldrich.ttf"));
         Intent intent = getIntent();
         fade = AnimationUtils.loadAnimation(this, R.anim.fade);
         int winner = intent.getIntExtra("winner", 0);

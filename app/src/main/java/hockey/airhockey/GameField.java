@@ -26,10 +26,12 @@ import static hockey.airhockey.MainActivity.goalThreshold;
 import static hockey.airhockey.MainActivity.height;
 import static hockey.airhockey.MainActivity.playerScale;
 import static hockey.airhockey.MainActivity.puckScale;
+import static hockey.airhockey.MainActivity.volume;
 import static hockey.airhockey.MainActivity.width;
 
 public class GameField extends SurfaceView implements Runnable {
 
+    long delta;
     private Thread thread;
     private Context context;
     private SurfaceHolder holder;
@@ -42,7 +44,6 @@ public class GameField extends SurfaceView implements Runnable {
     private Gate lowerGate, upperGate;
     private Puck puck;
     private long psec;
-    long delta;
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, x, y, count1, count2;
     private Paint paint;
@@ -113,7 +114,7 @@ public class GameField extends SurfaceView implements Runnable {
     // анимация перемещения шайбы и бит на изначальные позиции после гола
     private void playGoal() {
         isAnimation = true;
-        soundPool.play(goalSound, 1, 1, 0, 0, 1);
+        soundPool.play(goalSound, volume, volume, 0, 0, 1);
         puck.v.setVector((width / 2d - puck.x) / goalStopTime, (height / 2d - puck.y) / goalStopTime);
         player1.v.setVector((width / 2d - player1.x) / goalStopTime, (1.4 * playerScale - player1.y) / goalStopTime);
         player2.v.setVector((width / 2d - player2.x) / goalStopTime, (height - 1.4 * playerScale - player2.y) / goalStopTime);
@@ -243,7 +244,7 @@ public class GameField extends SurfaceView implements Runnable {
     private void collision(Vector speed, double alpha, boolean needSound) {
         if (needSound) {
             int random = (int) Math.round(Math.random() * 4);
-            soundPool.play(hitSound[random], 1, 1, 0, 0, 1);
+            soundPool.play(hitSound[random], volume, volume, 0, 0, 1);
         }
         Vector relative, collided = new Vector(0, 0);
         // нахождение скорости шайбы относительно биты
