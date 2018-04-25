@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -160,7 +161,11 @@ public class GameField extends SurfaceView implements Runnable {
         upperGate.draw(canvas);
         Rect bounds = new Rect();
         paint.getTextBounds(String.valueOf(count1), 0, 1, bounds);
-        canvas.drawText(String.valueOf(count1), (width - paint.measureText(String.valueOf(count1))) / 2f, (height / 1.9f + bounds.height()) / 2f, paint);
+        Path path = new Path();
+        path.reset();
+        path.moveTo((width + paint.measureText(String.valueOf(count1))) / 2f, (height / 1.9f - bounds.height()) / 2f);
+        path.lineTo((width - paint.measureText(String.valueOf(count1))) / 2f, (height / 1.9f - bounds.height()) / 2f);
+        canvas.drawTextOnPath(String.valueOf(count1), path, 0, 0, paint);
         paint.getTextBounds(String.valueOf(count2), 0, 1, bounds);
         canvas.drawText(String.valueOf(count2), (width - paint.measureText(String.valueOf(count2))) / 2f, (height * 1.475f + bounds.height()) / 2f, paint);
         player1.draw(canvas);
@@ -168,6 +173,7 @@ public class GameField extends SurfaceView implements Runnable {
         puck.draw(canvas);
     }
 
+    // нахождение расстояния между двумя точками
     private double length(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }

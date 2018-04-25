@@ -5,4 +5,6 @@
     <string name="win">Game Over</string>
     <string name="menu">Menu</string>
     <string name="restart">Restart</string>
+    <string name="about">Sehr gutes Spiel. Das beste Spiel der Welt</string>
+    <string name="about_version">version %1$s</string>
 </resources>
