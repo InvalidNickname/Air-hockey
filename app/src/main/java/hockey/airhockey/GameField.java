@@ -44,7 +44,7 @@ public class GameField extends SurfaceView implements Runnable {
     private Player player1, player2;
     private Gate lowerGate, upperGate;
     private Puck puck;
-    private long psec;
+    private long psec, turn;
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, x, y, count1, count2;
     private Paint paint;
@@ -58,6 +58,7 @@ public class GameField extends SurfaceView implements Runnable {
         holder = getHolder();
         count1 = 0;
         count2 = 0;
+        turn = Math.round(Math.random()) + 1;
         paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(Color.BLUE);
@@ -83,7 +84,9 @@ public class GameField extends SurfaceView implements Runnable {
         player1.update(delta, isAnimation);
         player2.update(delta, isAnimation);
         puck.update(delta, isAnimation);
-        if (isAnimation & length(puck.x, puck.y, width / 2, height / 2) <= puckScale / 2) {
+        if (isAnimation & length(puck.x, puck.y, width / 2, height / 3) <= puckScale / 2 & turn == 1) {
+            startGame();
+        } else if (isAnimation & length(puck.x, puck.y, width / 2, height * (2 / 3d)) <= puckScale / 2 & turn == 2) {
             startGame();
         }
     }
@@ -116,7 +119,11 @@ public class GameField extends SurfaceView implements Runnable {
     private void playGoal() {
         isAnimation = true;
         soundPool.play(goalSound, volume, volume, 0, 0, 1);
-        puck.v.setVector((width / 2d - puck.x) / goalStopTime, (height / 2d - puck.y) / goalStopTime);
+        if (turn == 1) {
+            puck.v.setVector((width / 2d - puck.x) / goalStopTime, (height / 3d - puck.y) / goalStopTime);
+        } else {
+            puck.v.setVector((width / 2d - puck.x) / goalStopTime, (height * (2 / 3d) - puck.y) / goalStopTime);
+        }
         player1.v.setVector((width / 2d - player1.x) / goalStopTime, (1.4 * playerScale - player1.y) / goalStopTime);
         player2.v.setVector((width / 2d - player2.x) / goalStopTime, (height - 1.4 * playerScale - player2.y) / goalStopTime);
     }
@@ -128,6 +135,11 @@ public class GameField extends SurfaceView implements Runnable {
         isCollision2 = false;
         psec = System.currentTimeMillis();
         loadGraphics();
+        if (turn == 1) {
+            turn = 2;
+        } else {
+            turn = 1;
+        }
         isAnimation = false;
     }
 
@@ -149,7 +161,11 @@ public class GameField extends SurfaceView implements Runnable {
         }
         player1 = new Player(playerArray[player1Chosen], context, 1);
         player2 = new Player(playerArray[player2Chosen], context, 2);
-        puck = new Puck(puckArray[puckChosen], context);
+        if (count2 == 0 & count1 == 0) {
+            puck = new Puck(puckArray[puckChosen], context);
+        } else {
+            puck = new Puck(puckArray[puckChosen], context, turn);
+        }
         lowerGate = new Gate(R.drawable.lower_gate, context, 1);
         upperGate = new Gate(R.drawable.upper_gate, context, 2);
     }

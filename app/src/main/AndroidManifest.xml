@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="hockey.airhockey"
-    android:versionName="0.15.3">
+    android:versionName="0.16">
 
     <application
         android:allowBackup="true"
@@ -31,7 +31,6 @@
             android:alwaysRetainTaskState="true" />
         <activity
             android:name=".WinActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/WinScreenTheme"
             android:alwaysRetainTaskState="true" />
         <activity android:name=".CreditsActivity" />

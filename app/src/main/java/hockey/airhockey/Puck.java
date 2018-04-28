@@ -17,11 +17,25 @@ class Puck {
     Vector v;
     private VectorDrawableCompat drawable;
 
+    Puck(int resId, Context context, long num) {
+        drawable = VectorDrawableCompat.create(context.getResources(), resId, null);
+        v = new Vector(0, 0);
+        if (num == 1) {
+            y = height / 3;
+        } else if (num == 2) {
+            y = height * (2 / 3d);
+        }
+        x = width / 2;
+        if (drawable != null) {
+            drawable.setBounds((int) x - puckScale, (int) y - puckScale, (int) x + puckScale, (int) y + puckScale);
+        }
+    }
+
     Puck(int resId, Context context) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);
         v = new Vector(0, 0);
-        x = width / 2;
         y = height / 2;
+        x = width / 2;
         if (drawable != null) {
             drawable.setBounds((int) x - puckScale, (int) y - puckScale, (int) x + puckScale, (int) y + puckScale);
         }
