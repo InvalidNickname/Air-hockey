@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="transparent">#00ffffff</color>
     <color name="colorText">#606060</color>
+    <color name="transparentGrey">#9a000000</color>
+    <color name="countdownText">#e6ffab00</color>
 </resources>

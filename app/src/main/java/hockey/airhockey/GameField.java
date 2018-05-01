@@ -17,6 +17,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.io.IOException;
+
 import static hockey.airhockey.GameCustomField.player1Chosen;
 import static hockey.airhockey.GameCustomField.player2Chosen;
 import static hockey.airhockey.GameCustomField.playerArray;
@@ -38,23 +40,27 @@ public class GameField extends SurfaceView implements Runnable {
     private SurfaceHolder holder;
     private SoundPool soundPool;
     private int[] hitSound = new int[5];
-    private int goalSound;
-    private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation;
+    private int goalSound, countdownSound;
+    private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loading;
     private VectorDrawableCompat background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
     private Puck puck;
-    private long psec, turn;
+    private long psec, turn, startTime;
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, x, y, count1, count2;
-    private Paint paint;
+    private Paint paint, countdownPaint;
 
     public GameField(Context context) {
         super(context);
         this.context = context;
         thread = new Thread();
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-        loadMusic();
+        try {
+            loadMusic();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         holder = getHolder();
         count1 = 0;
         count2 = 0;
@@ -65,6 +71,13 @@ public class GameField extends SurfaceView implements Runnable {
         paint.setTextSize(height / 3.5f);
         paint.setAlpha(50);
         paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
+        countdownPaint = new Paint();
+        countdownPaint.setAntiAlias(true);
+        countdownPaint.setColor(context.getResources().getColor(R.color.countdownText));
+        countdownPaint.setTextSize(height / 3f);
+        countdownPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
+        startingCountdown = true;
+        loading = true;
         startGame();
         thread.start();
     }
@@ -88,6 +101,11 @@ public class GameField extends SurfaceView implements Runnable {
             startGame();
         } else if (isAnimation & length(puck.x, puck.y, width / 2, height * (2 / 3d)) <= puckScale / 2 & turn == 2) {
             startGame();
+        }
+        if (!loading) {
+            if (sec - startTime > 3000 & startingCountdown) {
+                startingCountdown = false;
+            }
         }
     }
 
@@ -144,13 +162,24 @@ public class GameField extends SurfaceView implements Runnable {
     }
 
     // загрузка звуков
-    private void loadMusic() {
-        hitSound[0] = soundPool.load(context, R.raw.hit1, 1);
-        hitSound[1] = soundPool.load(context, R.raw.hit2, 1);
-        hitSound[2] = soundPool.load(context, R.raw.hit3, 1);
-        hitSound[3] = soundPool.load(context, R.raw.hit4, 1);
-        hitSound[4] = soundPool.load(context, R.raw.hit5, 1);
-        goalSound = soundPool.load(context, R.raw.goal, 1);
+    private void loadMusic() throws IOException {
+        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int i, int i1) {
+                if (i == 7) {
+                    soundPool.play(countdownSound, volume, volume, 0, 0, 1);
+                    startTime = System.currentTimeMillis();
+                    loading = false;
+                }
+            }
+        });
+        hitSound[0] = soundPool.load(context.getAssets().openFd("sounds/hitSound/hit1.wav"), 1);
+        hitSound[1] = soundPool.load(context.getAssets().openFd("sounds/hitSound/hit2.wav"), 1);
+        hitSound[2] = soundPool.load(context.getAssets().openFd("sounds/hitSound/hit3.wav"), 1);
+        hitSound[3] = soundPool.load(context.getAssets().openFd("sounds/hitSound/hit4.wav"), 1);
+        hitSound[4] = soundPool.load(context.getAssets().openFd("sounds/hitSound/hit5.wav"), 1);
+        goalSound = soundPool.load(context.getAssets().openFd("sounds/goal.wav"), 1);
+        countdownSound = soundPool.load(context.getAssets().openFd("sounds/countdown.wav"), 1);
     }
 
     // загрузка графики
@@ -187,6 +216,14 @@ public class GameField extends SurfaceView implements Runnable {
         player1.draw(canvas);
         player2.draw(canvas);
         puck.draw(canvas);
+        if (startingCountdown) {
+            canvas.drawColor(context.getResources().getColor(R.color.transparentGrey));
+            if (!loading) {
+                String countdown = String.valueOf((int) Math.ceil((3000 - System.currentTimeMillis() + startTime) / 1000d));
+                countdownPaint.getTextBounds(countdown, 0, 1, bounds);
+                canvas.drawText(countdown, (width - countdownPaint.measureText(countdown)) / 2f, (height + bounds.height()) / 2f, countdownPaint);
+            }
+        }
     }
 
     // нахождение расстояния между двумя точками
@@ -334,7 +371,7 @@ public class GameField extends SurfaceView implements Runnable {
                     pointerIndex = i;
                     pointerId = event.getPointerId(pointerIndex);
                     PointF point = activePointers.get(event.getPointerId(i));
-                    if (point != null & !isAnimation) {
+                    if (point != null & !isAnimation & !startingCountdown) {
                         point.x = event.getX(i);
                         point.y = event.getY(i);
                         if (isDragging1 & (pointerId == dragPointer1)) {
