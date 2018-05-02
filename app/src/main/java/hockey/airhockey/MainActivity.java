@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import static android.view.View.GONE;
@@ -26,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
     static float volume;
     static boolean friction;
     ImageView volumeButton;
-    Button start, credits;
-    Animation up, down;
+    ImageView start, credits;
+    Animation left, right;
     private boolean isAnimation;
     private SharedPreferences settings;
 
@@ -62,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
         if (volume == 0) {
             volumeButton.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.volume_off, null));
         }
-        up = AnimationUtils.loadAnimation(this, R.anim.go_up);
-        down = AnimationUtils.loadAnimation(this, R.anim.go_down);
+        left = AnimationUtils.loadAnimation(this, R.anim.go_left);
+        right = AnimationUtils.loadAnimation(this, R.anim.go_right);
         drawGates();
     }
 
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void startGame(View view) {
         if (!isAnimation) {
-            up.setAnimationListener(new Animation.AnimationListener() {
+            left.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
                     isAnimation = true;
@@ -109,14 +108,14 @@ public class MainActivity extends AppCompatActivity {
                 public void onAnimationRepeat(Animation animation) {
                 }
             });
-            start.startAnimation(up);
-            credits.startAnimation(down);
+            start.startAnimation(left);
+            credits.startAnimation(right);
         }
     }
 
     public void openCredits(View view) {
         if (!isAnimation) {
-            up.setAnimationListener(new Animation.AnimationListener() {
+            left.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
                     isAnimation = true;
@@ -135,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onAnimationRepeat(Animation animation) {
                 }
             });
-            start.startAnimation(up);
-            credits.startAnimation(down);
+            start.startAnimation(left);
+            credits.startAnimation(right);
         }
     }
 

@@ -2,9 +2,9 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
     tools:layout_editor_absoluteY="25dp">
 
     <ImageView
@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/background"
+        app:srcCompat="@drawable/background_cropped"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -46,35 +46,6 @@
         app:srcCompat="@drawable/upper_gate"
         tools:ignore="ContentDescription" />
 
-    <Button
-        android:id="@+id/credits"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:onClick="openCredits"
-        android:text="@string/settings"
-        android:textSize="@dimen/button_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/start" />
-
-    <Button
-        android:id="@+id/start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:onClick="startGame"
-        android:text="@string/start"
-        android:textSize="@dimen/button_size"
-        app:layout_constraintBottom_toTopOf="@+id/credits"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
     <ImageView
         android:id="@+id/volumeButton"
         android:layout_width="wrap_content"
@@ -90,5 +61,60 @@
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/volume_up"
         tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/start"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        android:onClick="startGame"
+        app:layout_constraintBottom_toBottomOf="@+id/credits"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/space"
+        app:layout_constraintStart_toEndOf="@id/space3"
+        app:layout_constraintTop_toTopOf="@+id/credits"
+        app:srcCompat="@drawable/play_circle"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/credits"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        android:onClick="openCredits"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/space2"
+        app:layout_constraintStart_toEndOf="@id/space"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/info"
+        tools:ignore="ContentDescription" />
+
+    <Space
+        android:id="@+id/space"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/credits"
+        app:layout_constraintEnd_toStartOf="@+id/credits"
+        app:layout_constraintStart_toEndOf="@+id/start"
+        app:layout_constraintTop_toTopOf="@+id/credits" />
+
+    <Space
+        android:id="@+id/space2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/credits"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/credits"
+        app:layout_constraintTop_toTopOf="@+id/credits" />
+
+    <Space
+        android:id="@+id/space3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/start"
+        app:layout_constraintEnd_toStartOf="@+id/start"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/start" />
 
 </android.support.constraint.ConstraintLayout>

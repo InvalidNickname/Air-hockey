@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Air hockey</string>
-    <string name="start">Go!</string>
-    <string name="settings">Credits</string>
     <string name="win">Game Over</string>
     <string name="menu">Menu</string>
     <string name="restart">Restart</string>

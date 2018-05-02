@@ -81,12 +81,12 @@ public class GameCustomField extends SurfaceView implements Runnable {
             background.setBounds(0, 0, width, height);
         }
         start = new Button(R.drawable.start_button, context, (int) (0.9074 * width), width, (int) (0.4375 * height), (int) (0.5625 * height));
-        puckLeft = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.5 * playerScale - 20), width / 2 - playerScale - 20, height / 2 - playerScale / 2, height / 2 + playerScale / 2);
-        puckRight = new Button(R.drawable.arrow_right, context, width / 2 + playerScale + 20, (int) (width / 2 + 1.5 * playerScale + 20), height / 2 - playerScale / 2, height / 2 + playerScale / 2);
-        player1Left = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.5 * playerScale - 20), width / 2 - playerScale - 20, (int) (0.9 * playerScale), (int) (1.9 * playerScale));
-        player1Right = new Button(R.drawable.arrow_right, context, width / 2 + playerScale + 20, (int) (width / 2 + 1.5 * playerScale + 20), (int) (0.9 * playerScale), (int) (1.9 * playerScale));
-        player2Left = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.5 * playerScale - 20), width / 2 - playerScale - 20, (int) (height - 1.9 * playerScale), (int) (height - 0.9 * playerScale));
-        player2Right = new Button(R.drawable.arrow_right, context, width / 2 + playerScale + 20, (int) (width / 2 + 1.5 * playerScale + 20), (int) (height - 1.9 * playerScale), (int) (height - 0.9 * playerScale));
+        puckLeft = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.7 * playerScale - 20), width / 2 - playerScale - 20, (int) (height / 2 - 0.7 * playerScale), (int) (height / 2 + 0.7 * playerScale));
+        puckRight = new Button(R.drawable.arrow_right, context, width / 2 + playerScale + 20, (int) (width / 2 + 1.7 * playerScale + 20), (int) (height / 2 - 0.7 * playerScale), (int) (height / 2 + 0.7 * playerScale));
+        player1Left = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.7 * playerScale - 20), width / 2 - playerScale - 20, (int) (0.7 * playerScale), (int) (2.1 * playerScale));
+        player1Right = new Button(R.drawable.arrow_right, context, width / 2 + playerScale + 20, (int) (width / 2 + 1.7 * playerScale + 20), (int) (0.7 * playerScale), (int) (2.1 * playerScale));
+        player2Left = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.7 * playerScale - 20), width / 2 - playerScale - 20, (int) (height - 2.1 * playerScale), (int) (height - 0.7 * playerScale));
+        player2Right = new Button(R.drawable.arrow_right, context, width / 2 + playerScale + 20, (int) (width / 2 + 1.7 * playerScale + 20), (int) (height - 2.1 * playerScale), (int) (height - 0.7 * playerScale));
         player1 = new Player(playerArray[player1Chosen], context, 1);
         player1.x = width + playerScale * 2;
         player2 = new Player(playerArray[player2Chosen], context, 2);
@@ -101,6 +101,8 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private void drawOnCanvas(Canvas canvas) {
         background.draw(canvas);
         start.draw(canvas);
+        lowerGate.draw(canvas);
+        upperGate.draw(canvas);
         if (animStop) {
             player1Left.draw(canvas);
             player1Right.draw(canvas);
@@ -109,8 +111,6 @@ public class GameCustomField extends SurfaceView implements Runnable {
             puckRight.draw(canvas);
             puckLeft.draw(canvas);
         }
-        lowerGate.draw(canvas);
-        upperGate.draw(canvas);
         player1.draw(canvas);
         player2.draw(canvas);
         puck.draw(canvas);
