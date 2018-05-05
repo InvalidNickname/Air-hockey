@@ -71,42 +71,67 @@
             app:srcCompat="@android:drawable/editbox_background"
             tools:ignore="ContentDescription" />
 
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:id="@+id/space2"
+            app:layout_constraintVertical_weight="1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/winText"/>
+
         <TextView
             android:id="@+id/winText"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:text="@string/win"
             android:textColor="@color/colorText"
             android:textSize="@dimen/win_text_size"
-            app:layout_constraintBottom_toTopOf="@id/menuButton"
+            app:layout_constraintVertical_weight="2"
+            app:layout_constraintBottom_toTopOf="@id/space3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/space2" />
 
-        <Button
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:id="@+id/space3"
+            app:layout_constraintVertical_weight="1"
+            app:layout_constraintTop_toBottomOf="@id/winText"
+            app:layout_constraintBottom_toTopOf="@id/menuButton"/>
+
+        <ImageView
             android:id="@+id/menuButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:onClick="goToMenu"
-            android:text="@string/menu"
-            android:textSize="@dimen/button_size"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_weight="2"
+            app:layout_constraintBottom_toTopOf="@id/space"
             app:layout_constraintEnd_toStartOf="@id/restartButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/winText" />
+            app:layout_constraintTop_toBottomOf="@id/space3"
+            app:srcCompat="@drawable/menu_button"
+            tools:ignore="ContentDescription" />
 
-        <Button
+        <ImageView
             android:id="@+id/restartButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:onClick="restartGame"
-            android:text="@string/restart"
-            android:textSize="@dimen/button_size"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/menuButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/menuButton"
             app:layout_constraintTop_toTopOf="@id/menuButton"
-            app:layout_constraintVertical_bias="0.0" />
+            app:srcCompat="@drawable/replay"
+            tools:ignore="ContentDescription" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:id="@+id/space"
+            app:layout_constraintVertical_weight="1"
+            app:layout_constraintTop_toBottomOf="@id/menuButton"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
 

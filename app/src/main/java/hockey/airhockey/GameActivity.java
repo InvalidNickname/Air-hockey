@@ -7,6 +7,7 @@ import android.view.WindowManager;
 public class GameActivity extends AppCompatActivity {
 
     GameField gameField;
+    private long backPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,5 +32,9 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (backPressed + 2000 > System.currentTimeMillis() & !gameField.isAbleToPause()) {
+            gameField.setPause();
+        }
+        backPressed = System.currentTimeMillis();
     }
 }

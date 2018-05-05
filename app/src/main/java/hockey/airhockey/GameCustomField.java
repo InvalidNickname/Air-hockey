@@ -41,6 +41,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
         puckArray = new int[numberOfPucks + 1];
         puckArray[0] = R.drawable.puck_default;
         puckArray[1] = R.drawable.puck_green;
+        puckArray[2] = R.drawable.puck_blue;
         playerArray = new int[numberOfPlayers + 1];
         playerArray[0] = R.drawable.player_default;
         playerArray[1] = R.drawable.player_black;
@@ -80,7 +81,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
         if (background != null) {
             background.setBounds(0, 0, width, height);
         }
-        start = new Button(R.drawable.start_button, context, (int) (0.9074 * width), width, (int) (0.4375 * height), (int) (0.5625 * height));
+        start = new Button(R.drawable.start_button, R.drawable.start_button_pressed, context, (int) (0.9074 * width), width, (int) (0.4375 * height), (int) (0.5625 * height));
         puckLeft = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.7 * playerScale - 20), width / 2 - playerScale - 20, (int) (height / 2 - 0.7 * playerScale), (int) (height / 2 + 0.7 * playerScale));
         puckRight = new Button(R.drawable.arrow_right, context, width / 2 + playerScale + 20, (int) (width / 2 + 1.7 * playerScale + 20), (int) (height / 2 - 0.7 * playerScale), (int) (height / 2 + 0.7 * playerScale));
         player1Left = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.7 * playerScale - 20), width / 2 - playerScale - 20, (int) (0.7 * playerScale), (int) (2.1 * playerScale));
@@ -118,56 +119,63 @@ public class GameCustomField extends SurfaceView implements Runnable {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            int x = (int) event.getX();
-            int y = (int) event.getY();
-            if (start.isClicked(x, y)) {
-                Intent intent = new Intent(context, GameActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                context.startActivity(intent);
-            }
-            if (puckLeft.isClicked(x, y)) {
-                puckChosen -= 1;
-                if (puckChosen < 0) {
-                    puckChosen = numberOfPucks;
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                int x = (int) event.getX();
+                int y = (int) event.getY();
+                if (start.isClicked(x, y)) {
+                    start.setPressed(true);
+                    Intent intent = new Intent(context, GameActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    context.startActivity(intent);
                 }
-                puck = new Puck(puckArray[puckChosen], context);
-                System.out.println(puckChosen);
-            }
-            if (puckRight.isClicked(x, y)) {
-                puckChosen++;
-                if (puckChosen > numberOfPucks) {
-                    puckChosen = 0;
+                if (puckLeft.isClicked(x, y)) {
+                    puckChosen -= 1;
+                    if (puckChosen < 0) {
+                        puckChosen = numberOfPucks;
+                    }
+                    puck = new Puck(puckArray[puckChosen], context);
+                    System.out.println(puckChosen);
                 }
-                puck = new Puck(puckArray[puckChosen], context);
-            }
-            if (player1Left.isClicked(x, y)) {
-                player1Chosen -= 1;
-                if (player1Chosen < 0) {
-                    player1Chosen = numberOfPlayers;
+                if (puckRight.isClicked(x, y)) {
+                    puckChosen++;
+                    if (puckChosen > numberOfPucks) {
+                        puckChosen = 0;
+                    }
+                    puck = new Puck(puckArray[puckChosen], context);
                 }
-                player1 = new Player(playerArray[player1Chosen], context, 1);
-            }
-            if (player1Right.isClicked(x, y)) {
-                player1Chosen++;
-                if (player1Chosen > numberOfPlayers) {
-                    player1Chosen = 0;
+                if (player1Left.isClicked(x, y)) {
+                    player1Chosen -= 1;
+                    if (player1Chosen < 0) {
+                        player1Chosen = numberOfPlayers;
+                    }
+                    player1 = new Player(playerArray[player1Chosen], context, 1);
                 }
-                player1 = new Player(playerArray[player1Chosen], context, 1);
-            }
-            if (player2Left.isClicked(x, y)) {
-                player2Chosen -= 1;
-                if (player2Chosen < 0) {
-                    player2Chosen = numberOfPlayers;
+                if (player1Right.isClicked(x, y)) {
+                    player1Chosen++;
+                    if (player1Chosen > numberOfPlayers) {
+                        player1Chosen = 0;
+                    }
+                    player1 = new Player(playerArray[player1Chosen], context, 1);
                 }
-                player2 = new Player(playerArray[player2Chosen], context, 2);
-            }
-            if (player2Right.isClicked(x, y)) {
-                player2Chosen++;
-                if (player2Chosen > numberOfPlayers) {
-                    player2Chosen = 0;
+                if (player2Left.isClicked(x, y)) {
+                    player2Chosen -= 1;
+                    if (player2Chosen < 0) {
+                        player2Chosen = numberOfPlayers;
+                    }
+                    player2 = new Player(playerArray[player2Chosen], context, 2);
                 }
-                player2 = new Player(playerArray[player2Chosen], context, 2);
+                if (player2Right.isClicked(x, y)) {
+                    player2Chosen++;
+                    if (player2Chosen > numberOfPlayers) {
+                        player2Chosen = 0;
+                    }
+                    player2 = new Player(playerArray[player2Chosen], context, 2);
+                }
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                start.setPressed(false);
             }
         }
         performClick();

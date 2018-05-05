@@ -7,7 +7,7 @@
     <integer name="friction_value">980</integer> <!-- коэффициент*1000 -->
     <integer name="goal_stop">1000</integer> <!-- время заморозки на анимацию после гола -->
     <integer name="start_anim_stop">700</integer> <!-- анимация перед началом игры -->
-    <integer name="number_of_pucks">2</integer> <!-- кол-во изображений шайбы -->
+    <integer name="number_of_pucks">3</integer> <!-- кол-во изображений шайбы -->
     <integer name="number_of_players">2</integer> <!-- кол-во изображений биты -->
     <integer name="goal_threshold">7</integer> <!-- до скольки очков идёт игра -->
 </resources>

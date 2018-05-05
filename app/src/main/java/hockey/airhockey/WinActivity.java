@@ -16,7 +16,6 @@ public class WinActivity extends AppCompatActivity {
 
     ImageView upperBlocker, lowerBlocker;
     TextView winText;
-    Button menu, restart;
     Animation fade;
 
     @Override
@@ -28,11 +27,7 @@ public class WinActivity extends AppCompatActivity {
         upperBlocker = findViewById(R.id.upperBlocker);
         lowerBlocker = findViewById(R.id.lowerBlocker);
         winText = findViewById(R.id.winText);
-        menu = findViewById(R.id.menuButton);
-        restart = findViewById(R.id.restartButton);
         winText.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/aldrich.ttf"));
-        menu.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/aldrich.ttf"));
-        restart.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/aldrich.ttf"));
         Intent intent = getIntent();
         fade = AnimationUtils.loadAnimation(this, R.anim.fade);
         int winner = intent.getIntExtra("winner", 0);

@@ -41,7 +41,7 @@ public class GameField extends SurfaceView implements Runnable {
     private SoundPool soundPool;
     private int[] hitSound = new int[5];
     private int goalSound, countdownSound;
-    private boolean isDrawing, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loading;
+    private boolean pause, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame;
     private VectorDrawableCompat background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
@@ -50,6 +50,7 @@ public class GameField extends SurfaceView implements Runnable {
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, x, y, count1, count2;
     private Paint paint, countdownPaint;
+    private Button play;
 
     public GameField(Context context) {
         super(context);
@@ -77,9 +78,17 @@ public class GameField extends SurfaceView implements Runnable {
         countdownPaint.setTextSize(height / 3f);
         countdownPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
         startingCountdown = true;
-        loading = true;
+        loadingGame = true;
         startGame();
         thread.start();
+    }
+
+    void setPause() {
+        pause = true;
+    }
+
+    boolean isAbleToPause() {
+        return startingCountdown;
     }
 
     // обновление игры
@@ -87,22 +96,24 @@ public class GameField extends SurfaceView implements Runnable {
         long sec = System.currentTimeMillis();
         delta = sec - psec;
         psec = sec;
-        if (!isAnimation) {
+        if (!isAnimation & !startingCountdown & !pause) {
             checkCollision();
             player1.setV(delta);
             player2.setV(delta);
             checkWinner();
             checkGoal();
         }
-        player1.update(delta, isAnimation);
-        player2.update(delta, isAnimation);
-        puck.update(delta, isAnimation);
+        if (!startingCountdown & !pause) {
+            player1.update(delta, isAnimation);
+            player2.update(delta, isAnimation);
+            puck.update(delta, isAnimation);
+        }
         if (isAnimation & length(puck.x, puck.y, width / 2, height / 3) <= puckScale / 2 & turn == 1) {
             startGame();
         } else if (isAnimation & length(puck.x, puck.y, width / 2, height * (2 / 3d)) <= puckScale / 2 & turn == 2) {
             startGame();
         }
-        if (!loading) {
+        if (!loadingGame) {
             if (sec - startTime > 3000 & startingCountdown) {
                 startingCountdown = false;
             }
@@ -169,7 +180,7 @@ public class GameField extends SurfaceView implements Runnable {
                 if (i == 7) {
                     soundPool.play(countdownSound, volume, volume, 0, 0, 1);
                     startTime = System.currentTimeMillis();
-                    loading = false;
+                    loadingGame = false;
                 }
             }
         });
@@ -184,6 +195,7 @@ public class GameField extends SurfaceView implements Runnable {
 
     // загрузка графики
     private void loadGraphics() {
+        play = new Button(R.drawable.play_circle_orange, context, (int) (0.4 * width), (int) (0.6 * width), (int) (height / 2 - 0.1 * width), (int) (height / 2 + 0.1 * width));
         background = VectorDrawableCompat.create(context.getResources(), R.drawable.background, null);
         if (background != null) {
             background.setBounds(0, 0, width, height);
@@ -218,11 +230,15 @@ public class GameField extends SurfaceView implements Runnable {
         puck.draw(canvas);
         if (startingCountdown) {
             canvas.drawColor(context.getResources().getColor(R.color.transparentGrey));
-            if (!loading) {
+            if (!loadingGame) {
                 String countdown = String.valueOf((int) Math.ceil((3000 - System.currentTimeMillis() + startTime) / 1000d));
                 countdownPaint.getTextBounds(countdown, 0, 1, bounds);
                 canvas.drawText(countdown, (width - countdownPaint.measureText(countdown)) / 2f, (height + bounds.height()) / 2f, countdownPaint);
             }
+        }
+        if (pause) {
+            canvas.drawColor(context.getResources().getColor(R.color.transparentGrey));
+            play.draw(canvas);
         }
     }
 
@@ -318,7 +334,7 @@ public class GameField extends SurfaceView implements Runnable {
 
     @Override
     public void run() {
-        while (isDrawing) {
+        while (draw) {
             if (holder.getSurface().isValid()) {
                 Canvas canvas = holder.lockCanvas();
                 update();
@@ -356,6 +372,9 @@ public class GameField extends SurfaceView implements Runnable {
                 activePointers.put(pointerId, pointF);
                 x = (int) pointF.x;
                 y = (int) pointF.y;
+                if (play.isClicked(x, y)) {
+                    pause = false;
+                }
                 if (isInside(player1.x, player1.y)) {
                     isDragging1 = true;
                     dragPointer1 = pointerId;
@@ -371,7 +390,7 @@ public class GameField extends SurfaceView implements Runnable {
                     pointerIndex = i;
                     pointerId = event.getPointerId(pointerIndex);
                     PointF point = activePointers.get(event.getPointerId(i));
-                    if (point != null & !isAnimation & !startingCountdown) {
+                    if (point != null & !isAnimation & !startingCountdown & !pause) {
                         point.x = event.getX(i);
                         point.y = event.getY(i);
                         if (isDragging1 & (pointerId == dragPointer1)) {
@@ -424,7 +443,7 @@ public class GameField extends SurfaceView implements Runnable {
     }
 
     public void pauseDrawing() {
-        isDrawing = false;
+        draw = false;
         try {
             thread.join();
         } catch (InterruptedException e) {
@@ -433,7 +452,7 @@ public class GameField extends SurfaceView implements Runnable {
     }
 
     public void resumeDrawing() {
-        isDrawing = true;
+        draw = true;
         thread = new Thread(this);
         thread.start();
     }
