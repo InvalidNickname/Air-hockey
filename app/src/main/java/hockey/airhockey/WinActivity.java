@@ -8,15 +8,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class WinActivity extends AppCompatActivity {
 
-    ImageView upperBlocker, lowerBlocker;
-    TextView winText;
-    Animation fade;
+    private ImageView upperBlocker, lowerBlocker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +23,10 @@ public class WinActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         upperBlocker = findViewById(R.id.upperBlocker);
         lowerBlocker = findViewById(R.id.lowerBlocker);
-        winText = findViewById(R.id.winText);
+        TextView winText = findViewById(R.id.winText);
         winText.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/aldrich.ttf"));
         Intent intent = getIntent();
-        fade = AnimationUtils.loadAnimation(this, R.anim.fade);
+        Animation fade = AnimationUtils.loadAnimation(this, R.anim.fade);
         int winner = intent.getIntExtra("winner", 0);
         if (winner == 1) {
             upperBlocker.setImageAlpha(0);

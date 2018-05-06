@@ -15,7 +15,7 @@ class Puck {
 
     double x, y;
     Vector v;
-    private VectorDrawableCompat drawable;
+    private final VectorDrawableCompat drawable;
 
     Puck(int resId, Context context, long num) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);

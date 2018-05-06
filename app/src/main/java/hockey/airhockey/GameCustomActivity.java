@@ -7,7 +7,7 @@ import android.view.WindowManager;
 
 public class GameCustomActivity extends AppCompatActivity {
 
-    GameCustomField gameCustomField;
+    private GameCustomField gameCustomField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

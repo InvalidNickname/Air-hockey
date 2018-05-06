@@ -24,14 +24,15 @@ public class MainActivity extends AppCompatActivity {
     static double frictionValue;
     static float volume;
     static boolean friction;
-    ImageView volumeButton;
-    ImageView start, credits;
-    Animation left, right;
+    private ImageView volumeButton;
+    private ImageView start, credits;
+    private Animation left, right;
     private boolean isAnimation;
     private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         settings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         width = getResources().getDisplayMetrics().widthPixels;

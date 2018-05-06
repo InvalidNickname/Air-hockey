@@ -10,8 +10,8 @@ import static hockey.airhockey.MainActivity.width;
 
 class Gate {
 
-    int leftCorner, rightCorner;
-    private VectorDrawableCompat drawable;
+    final int leftCorner, rightCorner;
+    private final VectorDrawableCompat drawable;
 
     Gate(int resId, Context context, int num) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);

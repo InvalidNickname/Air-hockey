@@ -1,5 +1,6 @@
 package hockey.airhockey;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -20,10 +21,9 @@ public class GameCustomField extends SurfaceView implements Runnable {
 
     static int player1Chosen, puckChosen, player2Chosen;
     static int[] puckArray, playerArray;
-    long delta;
     private Thread thread;
-    private Context context;
-    private SurfaceHolder holder;
+    private final Context context;
+    private final SurfaceHolder holder;
     private boolean isDrawing, isSpeedSet, animStop;
     private VectorDrawableCompat background;
     private Player player1, player2;
@@ -56,7 +56,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
     // обновление игры
     private void update() {
         long sec = System.currentTimeMillis();
-        delta = sec - psec;
+        long delta = sec - psec;
         psec = sec;
         if (!isSpeedSet & delta < 1000) {
             isSpeedSet = true;
@@ -117,6 +117,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
         puck.draw(canvas);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -178,13 +179,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
                 start.setPressed(false);
             }
         }
-        performClick();
         return true;
-    }
-
-    @Override
-    public boolean performClick() {
-        return super.performClick();
     }
 
     @Override

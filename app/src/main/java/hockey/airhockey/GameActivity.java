@@ -6,7 +6,7 @@ import android.view.WindowManager;
 
 public class GameActivity extends AppCompatActivity {
 
-    GameField gameField;
+    private GameField gameField;
     private long backPressed;
 
     @Override

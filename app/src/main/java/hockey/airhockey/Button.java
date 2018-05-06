@@ -6,8 +6,8 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 
 class Button {
 
-    int left, right, top, bottom;
-    private VectorDrawableCompat normal, pressed;
+    private final int left, right, top, bottom;
+    private final VectorDrawableCompat normal, pressed;
     private boolean isPressed;
 
     Button(int resId, int pressedResId, Context context, int left, int right, int top, int bottom) {
