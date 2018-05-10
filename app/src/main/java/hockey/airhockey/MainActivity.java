@@ -3,6 +3,8 @@ package hockey.airhockey;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.graphics.drawable.VectorDrawableCompat;
@@ -12,6 +14,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import static android.view.View.GONE;
 
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         settings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         width = getResources().getDisplayMetrics().widthPixels;
         height = getResources().getDisplayMetrics().heightPixels;
@@ -58,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         start = findViewById(R.id.start);
         credits = findViewById(R.id.credits);
+        TextView versionText = findViewById(R.id.version);
+        String versionName = "unknown";
+        try {
+            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        versionText.setText(String.format(getResources().getString(R.string.about_version), versionName));
         volumeButton = findViewById(R.id.volumeButton);
         if (volume == 0) {
             volumeButton.setBackground(VectorDrawableCompat.create(getResources(), R.drawable.volume_off, null));
@@ -65,6 +77,12 @@ public class MainActivity extends AppCompatActivity {
         left = AnimationUtils.loadAnimation(this, R.anim.go_left);
         right = AnimationUtils.loadAnimation(this, R.anim.go_right);
         drawGates();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
     }
 
     private void drawGates() {
@@ -75,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         upperParams.rightToRight = R.id.main;
         upperParams.topToTop = R.id.main;
         upperParams.bottomToBottom = R.id.main;
-        upperParams.topMargin = -100;
         upperParams.verticalBias = 0;
         upperGate.setLayoutParams(upperParams);
         ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
@@ -83,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         lowerParams.rightToRight = R.id.main;
         lowerParams.topToTop = R.id.main;
         lowerParams.bottomToBottom = R.id.main;
-        lowerParams.bottomMargin = -100;
         lowerParams.verticalBias = 1;
         lowerGate.setLayoutParams(lowerParams);
     }

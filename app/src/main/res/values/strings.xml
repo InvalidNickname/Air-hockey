@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Air hockey</string>
-    <string name="win">Game Over</string>
-    <string name="about">Sehr gutes Spiel. Das beste Spiel der Welt</string>
+    <string name="win" translatable="false">Game Over</string>
+    <string name="about">
+        Created by Alex Kiselev \n
+        Music by audionautix.com
+    </string>
     <string name="about_version">version %1$s</string>
 </resources>

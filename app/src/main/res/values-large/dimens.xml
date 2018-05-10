@@ -2,4 +2,5 @@
 <resources>
     <dimen name="win_text_size">56sp</dimen>
     <dimen name="text_size">26sp</dimen>
+    <dimen name="small_text">17sp</dimen>
 </resources>

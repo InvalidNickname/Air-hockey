@@ -1,35 +1,101 @@
 package hockey.airhockey;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ScrollView;
 
 import static hockey.airhockey.MainActivity.gateHeight;
+import static hockey.airhockey.MainActivity.height;
+import static hockey.airhockey.MainActivity.volume;
 import static hockey.airhockey.MainActivity.width;
 
-public class CreditsActivity extends AppCompatActivity {
+public class CreditsActivity extends AppCompatActivity implements Runnable {
+
+    private ScrollView scrollView;
+    private Thread thread;
+    private boolean isRunning;
+    private long sec;
+    private int current;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        thread = new Thread(this);
         setContentView(R.layout.activity_credits);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer = MediaPlayer.create(this, R.raw.night_runner);
+        mediaPlayer.setVolume(0.5f * volume, 0.5f * volume);
+        mediaPlayer.setLooping(true);
         overridePendingTransition(0, 0);
+        scrollView = findViewById(R.id.scrollView);
+        sec = System.currentTimeMillis();
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         drawGates();
-        TextView versionText = findViewById(R.id.versionText);
-        String versionName = "0.0";
+        thread.start();
+    }
+
+    @Override
+    public void run() {
+        while (isRunning) {
+            if (System.currentTimeMillis() - sec > 16000 / height) {
+                scrollView.smoothScrollBy(0, 1);
+                sec = System.currentTimeMillis();
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        thread = new Thread(this);
+        sec = System.currentTimeMillis();
+        thread.start();
+        isRunning = true;
+        this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        mediaPlayer.seekTo(current);
+        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+            @Override
+            public void onSeekComplete(MediaPlayer mediaPlayer) {
+                mediaPlayer.start();
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isRunning = false;
         try {
-            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
+            thread.join();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        versionText.setText(String.format(getResources().getString(R.string.about_version), versionName));
+        if (mediaPlayer.isPlaying()) {
+            current = mediaPlayer.getCurrentPosition();
+            mediaPlayer.pause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            try {
+                mediaPlayer.release();
+                mediaPlayer = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -40,22 +106,20 @@ public class CreditsActivity extends AppCompatActivity {
     }
 
     private void drawGates() {
-        ImageView upperGate = findViewById(R.id.upper_gate);
-        ImageView lowerGate = findViewById(R.id.lower_gate);
+        ImageView upperGate = findViewById(R.id.upperGate);
+        ImageView lowerGate = findViewById(R.id.lowerGate);
         ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
-        upperParams.leftToLeft = R.id.main_credits;
-        upperParams.rightToRight = R.id.main_credits;
-        upperParams.topToTop = R.id.main_credits;
-        upperParams.bottomToBottom = R.id.main_credits;
-        upperParams.topMargin = -100;
+        upperParams.leftToLeft = R.id.mainCredits;
+        upperParams.rightToRight = R.id.mainCredits;
+        upperParams.topToTop = R.id.mainCredits;
+        upperParams.bottomToBottom = R.id.mainCredits;
         upperParams.verticalBias = 0;
         upperGate.setLayoutParams(upperParams);
         ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
-        lowerParams.leftToLeft = R.id.main_credits;
-        lowerParams.rightToRight = R.id.main_credits;
-        lowerParams.topToTop = R.id.main_credits;
-        lowerParams.bottomToBottom = R.id.main_credits;
-        lowerParams.bottomMargin = -100;
+        lowerParams.leftToLeft = R.id.mainCredits;
+        lowerParams.rightToRight = R.id.mainCredits;
+        lowerParams.topToTop = R.id.mainCredits;
+        lowerParams.bottomToBottom = R.id.mainCredits;
         lowerParams.verticalBias = 1;
         lowerGate.setLayoutParams(lowerParams);
     }
