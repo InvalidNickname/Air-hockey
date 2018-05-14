@@ -10,4 +10,5 @@
     <integer name="number_of_pucks">3</integer> <!-- кол-во изображений шайбы -->
     <integer name="number_of_players">2</integer> <!-- кол-во изображений биты -->
     <integer name="goal_threshold">7</integer> <!-- до скольки очков идёт игра -->
+    <integer name="base_volume">60</integer> <!-- громкость в процентах -->
 </resources>

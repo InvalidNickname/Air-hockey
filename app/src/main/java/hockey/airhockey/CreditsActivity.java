@@ -9,8 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Space;
 
+import static hockey.airhockey.MainActivity.baseVolume;
 import static hockey.airhockey.MainActivity.gateHeight;
 import static hockey.airhockey.MainActivity.height;
 import static hockey.airhockey.MainActivity.volume;
@@ -33,10 +36,13 @@ public class CreditsActivity extends AppCompatActivity implements Runnable {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(this, R.raw.night_runner);
-        mediaPlayer.setVolume(0.5f * volume, 0.5f * volume);
+        mediaPlayer.setVolume(baseVolume * volume, baseVolume * volume);
         mediaPlayer.setLooping(true);
         overridePendingTransition(0, 0);
         scrollView = findViewById(R.id.scrollView);
+        Space space = findViewById(R.id.space);
+        LinearLayout.LayoutParams spaceParams = new LinearLayout.LayoutParams(0, height/2);
+        space.setLayoutParams(spaceParams);
         sec = System.currentTimeMillis();
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         drawGates();

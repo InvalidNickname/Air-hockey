@@ -316,14 +316,14 @@ public class GameField extends SurfaceView implements Runnable {
         }
     }
 
-    // столкновение биты с шайбой, alpha - угол наклона прямой, соединяющей центры шайбы и биты к прямой x
+    // столкновение точки с шайбой, alpha - угол наклона прямой, соединяющей центры точки и биты к прямой x
     private void collision(Vector speed, double alpha, boolean needSound) {
         if (needSound) {
             int random = (int) Math.round(Math.random() * 4);
             soundPool.play(hitSound[random], volume, volume, 0, 0, 1);
         }
         Vector relative, collided = new Vector(0, 0);
-        // нахождение скорости шайбы относительно биты
+        // нахождение скорости шайбы относительно точки
         relative = puck.v.deductVector(speed);
         // проецирование скорости шайбы в систему координат с наклоном прямой x на угол alpha, отражение vy
         collided.y = -(relative.x * Math.cos(alpha) + relative.y * Math.sin(alpha));

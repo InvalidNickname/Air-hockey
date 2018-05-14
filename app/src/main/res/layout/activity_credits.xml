@@ -56,20 +56,40 @@
         android:layout_height="match_parent"
         android:scrollbars="none">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/space"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_horizontal"
+                app:srcCompat="@drawable/logo_borderless_small"
+                tools:ignore="ContentDescription" />
+
             <TextView
                 android:id="@+id/aboutText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/about"
+                android:layout_weight="1"
                 android:textColor="@color/colorText"
                 android:textSize="@dimen/small_text"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/background"
-                app:layout_constraintTop_toTopOf="parent"
-                android:drawableTop="@drawable/logo_borderless_small"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
+        </LinearLayout>
 
     </ScrollView>
 
