@@ -21,6 +21,13 @@ public class GameCustomActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
+    private void hideSystemUI() {
+        View view = getWindow().getDecorView();
+        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION //
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //
+                | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -31,7 +38,7 @@ public class GameCustomActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         gameCustomField.resumeDrawing();
-        this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        hideSystemUI();
     }
 
     @Override

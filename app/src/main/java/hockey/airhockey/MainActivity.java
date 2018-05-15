@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -39,8 +41,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         settings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-        width = getResources().getDisplayMetrics().widthPixels;
-        height = getResources().getDisplayMetrics().heightPixels;
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getRealMetrics(metrics);
+        width = metrics.widthPixels;
+        height = metrics.heightPixels;
         playerScale = width / getResources().getInteger(R.integer.player_scale);
         puckScale = width / getResources().getInteger(R.integer.puck_scale);
         gateHeight = height / getResources().getInteger(R.integer.gate_height);
@@ -80,10 +85,17 @@ public class MainActivity extends AppCompatActivity {
         drawGates();
     }
 
+    private void hideSystemUI() {
+        View view = getWindow().getDecorView();
+        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION //
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //
+                | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        hideSystemUI();
     }
 
     private void drawGates() {

@@ -35,12 +35,13 @@ import static hockey.airhockey.MainActivity.width;
 
 public class GameField extends SurfaceView implements Runnable {
 
-    private long delta;
-    private Thread thread;
     private final Context context;
     private final SurfaceHolder holder;
     private final SoundPool soundPool;
     private final int[] hitSound = new int[5];
+    private final Paint paint, countdownPaint;
+    private long delta;
+    private Thread thread;
     private int goalSound, countdownSound;
     private boolean pause, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame;
     private VectorDrawableCompat background;
@@ -50,7 +51,6 @@ public class GameField extends SurfaceView implements Runnable {
     private long psec, turn, startTime;
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, x, y, count1, count2;
-    private final Paint paint, countdownPaint;
     private Button play;
 
     public GameField(Context context) {
@@ -90,6 +90,10 @@ public class GameField extends SurfaceView implements Runnable {
 
     boolean isAbleToPause() {
         return startingCountdown;
+    }
+
+    void setTimeAfterPause() {
+        psec = System.currentTimeMillis();
     }
 
     // обновление игры
