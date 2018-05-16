@@ -3,6 +3,8 @@ package hockey.airhockey;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,7 +14,6 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -44,7 +45,7 @@ public class GameField extends SurfaceView implements Runnable {
     private Thread thread;
     private int goalSound, countdownSound;
     private boolean pause, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame;
-    private VectorDrawableCompat background;
+    private Bitmap background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
     private Puck puck;
@@ -113,9 +114,14 @@ public class GameField extends SurfaceView implements Runnable {
             player2.update(delta, isAnimation);
             puck.update(delta, isAnimation);
         }
-        if (isAnimation & length(puck.x, puck.y, width / 2, height / 3) <= puckScale / 2 & turn == 1) {
+        if (isAnimation & puck.v.y >= 0 & turn == 1 & puck.y >= height / 3) {
             startGame();
-        } else if (isAnimation & length(puck.x, puck.y, width / 2, height * (2 / 3d)) <= puckScale / 2 & turn == 2) {
+        } else if (isAnimation & puck.v.y <= 0 & turn == 1 & puck.y <= height / 3) {
+            startGame();
+        }
+        if (isAnimation & puck.v.y >= 0 & turn == 2 & puck.y >= height * (2 / 3d)) {
+            startGame();
+        } else if (isAnimation & puck.v.y <= 0 & turn == 2 & puck.y <= height * (2 / 3d)) {
             startGame();
         }
         if (!loadingGame) {
@@ -201,10 +207,8 @@ public class GameField extends SurfaceView implements Runnable {
     // загрузка графики
     private void loadGraphics() {
         play = new Button(R.drawable.play_circle_orange, context, (int) (0.4 * width), (int) (0.6 * width), (int) (height / 2 - 0.1 * width), (int) (height / 2 + 0.1 * width));
-        background = VectorDrawableCompat.create(context.getResources(), R.drawable.background, null);
-        if (background != null) {
-            background.setBounds(0, 0, width, height);
-        }
+        background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background);
+        background = Bitmap.createScaledBitmap(background, width, height, true);
         player1 = new Player(playerArray[player1Chosen], context, 1);
         player2 = new Player(playerArray[player2Chosen], context, 2);
         if (count2 == 0 & count1 == 0) {
@@ -218,7 +222,7 @@ public class GameField extends SurfaceView implements Runnable {
 
     // рисование
     private void drawOnCanvas(Canvas canvas) {
-        background.draw(canvas);
+        canvas.drawBitmap(background, 0, 0, new Paint(Paint.ANTI_ALIAS_FLAG));
         lowerGate.draw(canvas);
         upperGate.draw(canvas);
         Rect bounds = new Rect();

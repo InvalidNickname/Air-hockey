@@ -5,7 +5,6 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.WindowManager;
 
 public class GameCustomActivity extends AppCompatActivity {
 
@@ -16,7 +15,6 @@ public class GameCustomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         gameCustomField = new GameCustomField(this);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(gameCustomField);
         overridePendingTransition(0, 0);
     }

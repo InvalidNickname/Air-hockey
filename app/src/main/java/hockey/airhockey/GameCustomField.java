@@ -3,8 +3,10 @@ package hockey.airhockey;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.support.graphics.drawable.VectorDrawableCompat;
+import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -21,11 +23,11 @@ public class GameCustomField extends SurfaceView implements Runnable {
 
     static int player1Chosen, puckChosen, player2Chosen;
     static int[] puckArray, playerArray;
-    private Thread thread;
     private final Context context;
     private final SurfaceHolder holder;
+    private Thread thread;
     private boolean isDrawing, isSpeedSet, animStop;
-    private VectorDrawableCompat background;
+    private Bitmap background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
     private Puck puck;
@@ -77,10 +79,8 @@ public class GameCustomField extends SurfaceView implements Runnable {
 
     // загрузка графики
     private void loadGraphics() {
-        background = VectorDrawableCompat.create(context.getResources(), R.drawable.background, null);
-        if (background != null) {
-            background.setBounds(0, 0, width, height);
-        }
+        background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background);
+        background = Bitmap.createScaledBitmap(background, width, height, true);
         start = new Button(R.drawable.start_button, R.drawable.start_button_pressed, context, (int) (0.9074 * width), width, (int) (0.4375 * height), (int) (0.5625 * height));
         puckLeft = new Button(R.drawable.arrow_left, context, (int) (width / 2 - 1.7 * playerScale - 20), width / 2 - playerScale - 20, (int) (height / 2 - 0.7 * playerScale), (int) (height / 2 + 0.7 * playerScale));
         puckRight = new Button(R.drawable.arrow_right, context, width / 2 + playerScale + 20, (int) (width / 2 + 1.7 * playerScale + 20), (int) (height / 2 - 0.7 * playerScale), (int) (height / 2 + 0.7 * playerScale));
@@ -100,7 +100,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
 
     // рисование
     private void drawOnCanvas(Canvas canvas) {
-        background.draw(canvas);
+        canvas.drawBitmap(background, 0, 0, new Paint(Paint.ANTI_ALIAS_FLAG));
         start.draw(canvas);
         lowerGate.draw(canvas);
         upperGate.draw(canvas);

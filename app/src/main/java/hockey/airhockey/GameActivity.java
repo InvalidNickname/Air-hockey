@@ -4,7 +4,8 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.WindowManager;
+
+import static hockey.airhockey.MainActivity.HIDE_FLAGS;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -16,16 +17,13 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         gameField = new GameField(GameActivity.this);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(gameField);
         overridePendingTransition(0, 0);
     }
 
     private void hideSystemUI() {
         View view = getWindow().getDecorView();
-        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION //
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //
-                | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        view.setSystemUiVisibility(HIDE_FLAGS);
     }
 
     @Override
