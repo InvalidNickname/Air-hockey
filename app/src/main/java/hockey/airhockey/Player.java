@@ -4,28 +4,26 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.graphics.drawable.VectorDrawableCompat;
 
-import static hockey.airhockey.MainActivity.height;
-import static hockey.airhockey.MainActivity.playerScale;
-import static hockey.airhockey.MainActivity.width;
+import static hockey.airhockey.MainActivity.settings;
 
 class Player {
 
-    double x, y;
     final Vector v;
-    private double xp, yp;
     private final VectorDrawableCompat drawable;
+    double x, y;
+    private double xp, yp;
 
     Player(int resId, Context context, int num) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);
         v = new Vector(0, 0);
-        x = width / 2;
+        x = settings.width / 2;
         if (num == 1) {
-            y = (int) (1.4 * playerScale);
+            y = (int) (1.4 * settings.playerScale);
         } else {
-            y = height - (int) (1.4 * playerScale);
+            y = settings.height - (int) (1.4 * settings.playerScale);
         }
         if (drawable != null) {
-            drawable.setBounds((int) x - playerScale, (int) y - playerScale, (int) x + playerScale, (int) y + playerScale);
+            drawable.setBounds((int) x - settings.playerScale, (int) y - settings.playerScale, (int) x + settings.playerScale, (int) y + settings.playerScale);
         }
         xp = x;
         yp = y;
@@ -40,7 +38,7 @@ class Player {
             x += v.x * delta;
             y += v.y * delta;
         }
-        drawable.setBounds((int) x - playerScale, (int) y - playerScale, (int) x + playerScale, (int) y + playerScale);
+        drawable.setBounds((int) x - settings.playerScale, (int) y - settings.playerScale, (int) x + settings.playerScale, (int) y + settings.playerScale);
     }
 
     void setV(long delta) {

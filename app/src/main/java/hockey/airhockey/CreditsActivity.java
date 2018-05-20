@@ -13,11 +13,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Space;
 
-import static hockey.airhockey.MainActivity.baseVolume;
-import static hockey.airhockey.MainActivity.gateHeight;
-import static hockey.airhockey.MainActivity.height;
+import static hockey.airhockey.MainActivity.HIDE_FLAGS;
+import static hockey.airhockey.MainActivity.settings;
 import static hockey.airhockey.MainActivity.volume;
-import static hockey.airhockey.MainActivity.width;
 
 public class CreditsActivity extends AppCompatActivity implements Runnable {
 
@@ -36,12 +34,12 @@ public class CreditsActivity extends AppCompatActivity implements Runnable {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(this, R.raw.night_runner);
-        mediaPlayer.setVolume(baseVolume * volume, baseVolume * volume);
+        mediaPlayer.setVolume(settings.baseVolume * volume, settings.baseVolume * volume);
         mediaPlayer.setLooping(true);
         overridePendingTransition(0, 0);
         scrollView = findViewById(R.id.scrollView);
         Space space = findViewById(R.id.space);
-        LinearLayout.LayoutParams spaceParams = new LinearLayout.LayoutParams(0, height);
+        LinearLayout.LayoutParams spaceParams = new LinearLayout.LayoutParams(0, settings.height);
         space.setLayoutParams(spaceParams);
         sec = System.currentTimeMillis();
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -51,15 +49,13 @@ public class CreditsActivity extends AppCompatActivity implements Runnable {
 
     private void hideSystemUI() {
         View view = getWindow().getDecorView();
-        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION //
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //
-                | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        view.setSystemUiVisibility(HIDE_FLAGS);
     }
 
     @Override
     public void run() {
         while (isRunning) {
-            if (System.currentTimeMillis() - sec > 16000 / height) {
+            if (System.currentTimeMillis() - sec > 16000 / settings.height) {
                 scrollView.smoothScrollBy(0, 1);
                 sec = System.currentTimeMillis();
             }
@@ -121,14 +117,14 @@ public class CreditsActivity extends AppCompatActivity implements Runnable {
     private void drawGates() {
         ImageView upperGate = findViewById(R.id.upperGate);
         ImageView lowerGate = findViewById(R.id.lowerGate);
-        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
+        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (0.48 * settings.width), settings.gateHeight);
         upperParams.leftToLeft = R.id.mainCredits;
         upperParams.rightToRight = R.id.mainCredits;
         upperParams.topToTop = R.id.mainCredits;
         upperParams.bottomToBottom = R.id.mainCredits;
         upperParams.verticalBias = 0;
         upperGate.setLayoutParams(upperParams);
-        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (0.48 * width), gateHeight);
+        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (0.48 * settings.width), settings.gateHeight);
         lowerParams.leftToLeft = R.id.mainCredits;
         lowerParams.rightToRight = R.id.mainCredits;
         lowerParams.topToTop = R.id.mainCredits;

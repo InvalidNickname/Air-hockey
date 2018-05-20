@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import static hockey.airhockey.MainActivity.HIDE_FLAGS;
+
 public class GameCustomActivity extends AppCompatActivity {
 
     private GameCustomField gameCustomField;
@@ -21,9 +23,7 @@ public class GameCustomActivity extends AppCompatActivity {
 
     private void hideSystemUI() {
         View view = getWindow().getDecorView();
-        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION //
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //
-                | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        view.setSystemUiVisibility(HIDE_FLAGS);
     }
 
     @Override
