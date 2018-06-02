@@ -11,4 +11,5 @@
     <integer name="number_of_players">2</integer> <!-- кол-во изображений биты -->
     <integer name="goal_threshold">7</integer> <!-- до скольки очков идёт игра -->
     <integer name="base_volume">60</integer> <!-- громкость в процентах -->
+    <integer name="mode_change_time">1000</integer> <!-- время на анимацию при смене режима -->
 </resources>

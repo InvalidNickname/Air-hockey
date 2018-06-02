@@ -51,6 +51,7 @@ public class GameField extends SurfaceView implements Runnable {
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, x, y, count1, count2;
     private Button play, back;
+    private double capSpeed;
 
     public GameField(Context context) {
         super(context);
@@ -106,15 +107,20 @@ public class GameField extends SurfaceView implements Runnable {
         long sec = System.currentTimeMillis();
         delta = sec - psec;
         psec = sec;
+        capSpeed = settings.height / 1560d;
         if (!isAnimation & !startingCountdown & !pause) {
             checkCollision();
-            player1.setV(delta);
+            if (multiplayer) {
+                player1.setV(delta);
+            } else {
+                moveBot();
+            }
             player2.setV(delta);
             checkWinner();
             checkGoal();
         }
         if (!startingCountdown & !pause) {
-            player1.update(delta, isAnimation);
+            player1.update(delta, isAnimation || !multiplayer);
             player2.update(delta, isAnimation);
             puck.update(delta, isAnimation);
         }
@@ -151,10 +157,12 @@ public class GameField extends SurfaceView implements Runnable {
         if (count1 >= settings.goalThreshold) {
             Intent intent = new Intent(context, WinActivity.class);
             intent.putExtra("winner", 1);
+            intent.putExtra("multiplayer", multiplayer);
             context.startActivity(intent);
         } else if (count2 >= settings.goalThreshold) {
             Intent intent = new Intent(context, WinActivity.class);
             intent.putExtra("winner", 2);
+            intent.putExtra("multiplayer", multiplayer);
             context.startActivity(intent);
         }
     }
@@ -331,6 +339,35 @@ public class GameField extends SurfaceView implements Runnable {
             if (!(length(px, py, plx2, ply2) < settings.playerScale + settings.puckScale - 5)) {
                 isCollision2 = false;
             }
+        }
+    }
+
+    // движение верхней биты, если игра против ИИ
+    private void moveBot() {
+        if (puck.y - settings.puckScale < settings.height / 2 & length(puck.x, puck.y, player1.x, player1.y) >= settings.playerScale + settings.puckScale - 5) {
+            double y = capSpeed / Math.sqrt(Math.pow((puck.x - player1.x) / (puck.y - player1.y), 2) + 1);
+            if (puck.y < player1.y) {
+                y = -Math.abs(y);
+            }
+            double x = Math.sqrt(Math.pow(capSpeed, 2) - Math.pow(y, 2));
+            if (puck.x < player1.x) {
+                x = -Math.abs(x);
+            }
+            player1.setV(x, y);
+        } else if (length(player1.x, player1.y, settings.width / 2, 1.4 * settings.playerScale) > player1.v.v * delta) {
+            double y = capSpeed / Math.sqrt(Math.pow((settings.width / 2 - player1.x) / (1.4 * settings.playerScale - player1.y), 2) + 1);
+            if (1.4 * settings.playerScale < player1.y) {
+                y = -Math.abs(y);
+            }
+            double x = Math.sqrt(Math.pow(capSpeed, 2) - Math.pow(y, 2));
+            if (settings.width / 2 < player1.x) {
+                x = -Math.abs(x);
+            }
+            player1.setV(x, y);
+        } else {
+            player1.x = settings.width / 2;
+            player1.y = 1.4 * settings.playerScale;
+            player1.setV(0, 0);
         }
     }
 

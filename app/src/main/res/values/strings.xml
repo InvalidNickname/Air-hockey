@@ -6,4 +6,8 @@
         Music by audionautix.com
     </string>
     <string name="about_version">version %1$s</string>
+    <string name="vs_ai">AI</string>
+    <string name="vs_human">HUMAN</string>
+    <string name="lose_ai" translatable="false">You Lose</string>
+    <string name="win_ai" translatable="false">You Win</string>
 </resources>

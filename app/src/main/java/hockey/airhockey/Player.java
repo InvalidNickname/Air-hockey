@@ -49,4 +49,8 @@ class Player {
         yp = y;
     }
 
+    void setV(double x, double y) {
+        v.setVector(x, y);
+    }
+
 }

@@ -177,4 +177,6 @@
 
         music by audionautix.com
     </string>
+    <string name="vs_ai">ИИ</string>
+    <string name="vs_human">ЧЕЛОВЕК</string>
 </resources>

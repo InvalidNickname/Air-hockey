@@ -33,6 +33,9 @@ public class WinActivity extends AppCompatActivity {
         Animation fade = AnimationUtils.loadAnimation(this, R.anim.fade);
         int winner = intent.getIntExtra("winner", 0);
         if (winner == 1) {
+            if (!intent.getBooleanExtra("multiplayer", true)) {
+                winText.setText(R.string.lose_ai);
+            }
             upperBlocker.setImageAlpha(0);
             fade.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -50,6 +53,9 @@ public class WinActivity extends AppCompatActivity {
             });
             lowerBlocker.startAnimation(fade);
         } else {
+            if (!intent.getBooleanExtra("multiplayer", true)) {
+                winText.setText(R.string.win_ai);
+            }
             lowerBlocker.setImageAlpha(0);
             fade.setAnimationListener(new Animation.AnimationListener() {
                 @Override

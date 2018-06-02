@@ -7,7 +7,10 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -24,19 +27,26 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private final SurfaceHolder holder;
     private final SharedPreferences preferences;
     private Thread thread;
-    private boolean isDrawing, isSpeedSet, animStop, multiplayer;
+    private boolean isDrawing, isSpeedSet, animStop, multiplayer, modeClicked;
     private Bitmap background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
     private Puck puck;
-    private long psec;
+    private long psec, modeTime;
+    private String multiplayerText;
     private Button start, puckLeft, puckRight, player1Left, player1Right, player2Left, player2Right, mode;
+    private Paint paint;
 
     public GameCustomField(Context context) {
         super(context);
         this.context = context;
         preferences = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         multiplayer = preferences.getBoolean(APP_PREFERENCES_MULTIPLAYER, true);
+        if (multiplayer) {
+            multiplayerText = context.getResources().getString(R.string.vs_human);
+        } else {
+            multiplayerText = context.getResources().getString(R.string.vs_ai);
+        }
         player1Chosen = 0;
         player2Chosen = 0;
         puckChosen = 0;
@@ -47,12 +57,28 @@ public class GameCustomField extends SurfaceView implements Runnable {
         playerArray = new int[settings.numberOfPlayers + 1];
         playerArray[0] = R.drawable.player_default;
         playerArray[1] = R.drawable.player_black;
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        paint.setColor(Color.BLUE);
+        findBestTextSize();
+        paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
         thread = new Thread();
         holder = getHolder();
         loadGraphics();
         isSpeedSet = false;
         animStop = false;
         thread.start();
+    }
+
+    // нахождение лучшего размера текста
+    private void findBestTextSize() {
+        int i = 0;
+        while (true) {
+            i++;
+            paint.setTextSize(settings.height / i);
+            if (paint.measureText(String.valueOf(R.string.vs_human)) <= settings.width * (2 / 3f)) {
+                break;
+            }
+        }
     }
 
     // обновление игры
@@ -117,6 +143,16 @@ public class GameCustomField extends SurfaceView implements Runnable {
         player1.draw(canvas);
         player2.draw(canvas);
         puck.draw(canvas);
+        if (modeClicked) {
+            if (System.currentTimeMillis() - modeTime < settings.modeChangeTime) {
+                paint.setAlpha(100 - (int) ((System.currentTimeMillis() - modeTime) / (settings.modeChangeTime / 100)));
+                Rect bounds = new Rect();
+                paint.getTextBounds(String.valueOf(multiplayerText), 0, 1, bounds);
+                canvas.drawText(String.valueOf(multiplayerText), (settings.width - paint.measureText(String.valueOf(multiplayerText))) / 2f, (settings.height * 0.5f + bounds.height()) / 2f, paint);
+            } else {
+                modeClicked = false;
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -193,6 +229,14 @@ public class GameCustomField extends SurfaceView implements Runnable {
                 }
                 if (mode.isClicked(x, y)) {
                     multiplayer = !multiplayer;
+                    paint.setAlpha(100);
+                    modeClicked = true;
+                    if (multiplayer) {
+                        multiplayerText = context.getResources().getString(R.string.vs_human);
+                    } else {
+                        multiplayerText = context.getResources().getString(R.string.vs_ai);
+                    }
+                    modeTime = System.currentTimeMillis();
                 }
             }
         }
