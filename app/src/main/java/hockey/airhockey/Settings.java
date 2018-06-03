@@ -7,10 +7,10 @@ import android.view.Display;
 
 final class Settings {
 
-    double frictionValue;
-    int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers, goalThreshold, modeChangeTime;
-    float baseVolume;
-    boolean friction;
+    final double frictionValue;
+    final int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers, goalThreshold, modeChangeTime;
+    final float baseVolume;
+    final boolean friction;
 
     Settings(Context context) {
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();

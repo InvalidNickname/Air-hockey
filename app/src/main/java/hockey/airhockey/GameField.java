@@ -52,6 +52,8 @@ public class GameField extends SurfaceView implements Runnable {
     private int dragPointer1, dragPointer2, x, y, count1, count2;
     private Button play, back;
     private double capSpeed;
+    private final Path path;
+    private final Rect bounds;
 
     public GameField(Context context) {
         super(context);
@@ -68,6 +70,8 @@ public class GameField extends SurfaceView implements Runnable {
             e.printStackTrace();
         }
         holder = getHolder();
+        path = new Path();
+        bounds = new Rect();
         count1 = 0;
         count2 = 0;
         turn = Math.round(Math.random()) + 1;
@@ -242,9 +246,7 @@ public class GameField extends SurfaceView implements Runnable {
         canvas.drawBitmap(background, 0, 0, new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG));
         lowerGate.draw(canvas);
         upperGate.draw(canvas);
-        Rect bounds = new Rect();
         paint.getTextBounds(String.valueOf(count1), 0, 1, bounds);
-        Path path = new Path();
         path.reset();
         path.moveTo((settings.width + paint.measureText(String.valueOf(count1))) / 2f, (settings.height / 1.9f - bounds.height()) / 2f);
         path.lineTo((settings.width - paint.measureText(String.valueOf(count1))) / 2f, (settings.height / 1.9f - bounds.height()) / 2f);
@@ -353,9 +355,9 @@ public class GameField extends SurfaceView implements Runnable {
             if (puck.x < player1.x) {
                 x = -Math.abs(x);
             }
-            player1.setV(x, y);
-        } else if (length(player1.x, player1.y, settings.width / 2, 1.4 * settings.playerScale) > player1.v.v * delta) {
-            double y = capSpeed / Math.sqrt(Math.pow((settings.width / 2 - player1.x) / (1.4 * settings.playerScale - player1.y), 2) + 1);
+            player1.v.setVector(x, y);
+        } else if (length(player1.x, player1.y, settings.width / 2, (int) (1.4 * settings.playerScale)) > player1.v.v * delta) {
+            double y = capSpeed / Math.sqrt(Math.pow((settings.width / 2 - player1.x) / ((int) (1.4 * settings.playerScale) - player1.y), 2) + 1);
             if (1.4 * settings.playerScale < player1.y) {
                 y = -Math.abs(y);
             }
@@ -363,11 +365,11 @@ public class GameField extends SurfaceView implements Runnable {
             if (settings.width / 2 < player1.x) {
                 x = -Math.abs(x);
             }
-            player1.setV(x, y);
+            player1.v.setVector(x, y);
         } else {
+            player1.v.setVector(0, 0);
             player1.x = settings.width / 2;
-            player1.y = 1.4 * settings.playerScale;
-            player1.setV(0, 0);
+            player1.y = (int) (1.4 * settings.playerScale);
         }
     }
 
@@ -439,7 +441,7 @@ public class GameField extends SurfaceView implements Runnable {
                         context.startActivity(intent);
                     }
                 }
-                if (isInside(player1.x, player1.y)) {
+                if (isInside(player1.x, player1.y) & multiplayer) {
                     isDragging1 = true;
                     dragPointer1 = pointerId;
                 }

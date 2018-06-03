@@ -17,10 +17,11 @@ import static hockey.airhockey.MainActivity.HIDE_FLAGS;
 import static hockey.airhockey.MainActivity.settings;
 import static hockey.airhockey.MainActivity.volume;
 
-public class CreditsActivity extends AppCompatActivity implements Runnable {
+public class CreditsActivity extends AppCompatActivity {
 
     private ScrollView scrollView;
     private Thread thread;
+    private Runnable runnable;
     private boolean isRunning;
     private long sec;
     private int current;
@@ -29,7 +30,18 @@ public class CreditsActivity extends AppCompatActivity implements Runnable {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        thread = new Thread(this);
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                while (isRunning) {
+                    if (System.currentTimeMillis() - sec > 16000 / settings.height) {
+                        scrollView.smoothScrollBy(0, 1);
+                        sec = System.currentTimeMillis();
+                    }
+                }
+            }
+        };
+        thread = new Thread(runnable);
         setContentView(R.layout.activity_credits);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         mediaPlayer = new MediaPlayer();
@@ -53,19 +65,9 @@ public class CreditsActivity extends AppCompatActivity implements Runnable {
     }
 
     @Override
-    public void run() {
-        while (isRunning) {
-            if (System.currentTimeMillis() - sec > 16000 / settings.height) {
-                scrollView.smoothScrollBy(0, 1);
-                sec = System.currentTimeMillis();
-            }
-        }
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        thread = new Thread(this);
+        thread = new Thread(runnable);
         sec = System.currentTimeMillis();
         thread.start();
         isRunning = true;
