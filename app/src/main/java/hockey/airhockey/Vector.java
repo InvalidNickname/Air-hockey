@@ -21,9 +21,6 @@ class Vector {
     }
 
     Vector multiplyVector(double multiplier) {
-        double x, y;
-        x = multiplier * this.x;
-        y = multiplier * this.y;
-        return new Vector(x, y);
+        return new Vector(multiplier * this.x, multiplier * this.y);
     }
 }

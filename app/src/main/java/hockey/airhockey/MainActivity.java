@@ -78,14 +78,14 @@ public class MainActivity extends AppCompatActivity {
     private void drawGates() {
         ImageView upperGate = findViewById(R.id.upper_gate);
         ImageView lowerGate = findViewById(R.id.lower_gate);
-        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (0.48 * settings.width), settings.gateHeight);
+        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (settings.width * 0.74) - (int) (settings.width * 0.26), settings.gateHeight);
         upperParams.leftToLeft = R.id.main;
         upperParams.rightToRight = R.id.main;
         upperParams.topToTop = R.id.main;
         upperParams.bottomToBottom = R.id.main;
         upperParams.verticalBias = 0;
         upperGate.setLayoutParams(upperParams);
-        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (0.48 * settings.width), settings.gateHeight);
+        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (settings.width * 0.74) - (int) (settings.width * 0.26), settings.gateHeight);
         lowerParams.leftToLeft = R.id.main;
         lowerParams.rightToRight = R.id.main;
         lowerParams.topToTop = R.id.main;

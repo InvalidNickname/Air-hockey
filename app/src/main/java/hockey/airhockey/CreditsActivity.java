@@ -119,14 +119,14 @@ public class CreditsActivity extends AppCompatActivity {
     private void drawGates() {
         ImageView upperGate = findViewById(R.id.upperGate);
         ImageView lowerGate = findViewById(R.id.lowerGate);
-        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (0.48 * settings.width), settings.gateHeight);
+        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (settings.width * 0.74) - (int) (settings.width * 0.26), settings.gateHeight);
         upperParams.leftToLeft = R.id.mainCredits;
         upperParams.rightToRight = R.id.mainCredits;
         upperParams.topToTop = R.id.mainCredits;
         upperParams.bottomToBottom = R.id.mainCredits;
         upperParams.verticalBias = 0;
         upperGate.setLayoutParams(upperParams);
-        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (0.48 * settings.width), settings.gateHeight);
+        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (settings.width * 0.74) - (int) (settings.width * 0.26), settings.gateHeight);
         lowerParams.leftToLeft = R.id.mainCredits;
         lowerParams.rightToRight = R.id.mainCredits;
         lowerParams.topToTop = R.id.mainCredits;
