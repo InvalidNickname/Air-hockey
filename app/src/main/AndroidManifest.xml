@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="hockey.airhockey"
-    android:versionName="0.19.2">
+    android:versionName="0.19.2-revert">
 
     <application
         android:allowBackup="true"

@@ -40,6 +40,7 @@ public class GameActivity extends AppCompatActivity {
         super.onResume();
         gameField.resumeDrawing();
         hideSystemUI();
+        gameField.setTimeAfterPause();
     }
 
     @Override

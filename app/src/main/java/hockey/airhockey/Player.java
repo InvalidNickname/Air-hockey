@@ -12,7 +12,6 @@ class Player {
     private final VectorDrawableCompat drawable;
     double x, y;
     private double xp, yp;
-    private long psec;
 
     Player(int resId, Context context, int num) {
         drawable = VectorDrawableCompat.create(context.getResources(), resId, null);
@@ -28,14 +27,13 @@ class Player {
         }
         xp = x;
         yp = y;
-        psec = System.currentTimeMillis();
     }
 
     void draw(Canvas canvas) {
         drawable.draw(canvas);
     }
 
-    void update(double delta, boolean isAnimation) {
+    void update(long delta, boolean isAnimation) {
         if (isAnimation) {
             x += v.x * delta;
             y += v.y * delta;
@@ -43,15 +41,12 @@ class Player {
         drawable.setBounds((int) x - settings.playerScale, (int) y - settings.playerScale, (int) x + settings.playerScale, (int) y + settings.playerScale);
     }
 
-    void setV(double delta) {
-        if (System.currentTimeMillis() - psec >= 5) {
-            v.x = (x - xp) / (delta + .0);
-            v.y = (y - yp) / (delta + .0);
-            v.setVector(v.x, v.y);
-            xp = x;
-            yp = y;
-            psec = System.currentTimeMillis();
-        }
+    void setV(long delta) {
+        v.x = (x - xp) / delta;
+        v.y = (y - yp) / delta;
+        v.setVector(v.x, v.y);
+        xp = x;
+        yp = y;
     }
 
 }
