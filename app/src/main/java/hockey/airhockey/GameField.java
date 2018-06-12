@@ -41,24 +41,40 @@ public class GameField extends SurfaceView implements Runnable {
     private final Paint paint, countdownPaint;
     private final Path path;
     private final Rect bounds;
+    private final Runnable graphicalRunnable;
     private int goalSound, countdownSound;
     private boolean pause, multiplayer, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame;
     private Bitmap background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
     private Puck puck;
-    private long delta;
     private SparseArray<PointF> activePointers;
-    private int dragPointer1, dragPointer2, x, y, count1, count2;
+    private int dragPointer1, dragPointer2, count1, count2;
     private Button play, back;
-    private double capSpeed;
-    private Thread thread;
-    private long psec, turn, startTime;
+    private double capSpeed, x, y;
+    private Thread thread, graphicalThread;
+    private long psec, turn, startTime, delta, sec;
+    private boolean isGraphicalThreadRunning;
 
     public GameField(Context context) {
         super(context);
         this.context = context;
         thread = new Thread();
+        isGraphicalThreadRunning = false;
+        graphicalRunnable = new Runnable() {
+            @Override
+            public void run() {
+                while (draw) {
+                    if (holder.getSurface().isValid() & isGraphicalThreadRunning) {
+                        Canvas canvas = holder.lockCanvas();
+                        drawOnCanvas(canvas);
+                        holder.unlockCanvasAndPost(canvas);
+                        isGraphicalThreadRunning = false;
+                    }
+                }
+            }
+        };
+        graphicalThread = new Thread(graphicalRunnable);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             soundPool = new SoundPool.Builder().setMaxStreams(5).build();
         } else {
@@ -88,6 +104,7 @@ public class GameField extends SurfaceView implements Runnable {
         loadingGame = true;
         startGame();
         thread.start();
+        graphicalThread.start();
     }
 
     void setMultiplayer(boolean multiplayer) {
@@ -102,15 +119,8 @@ public class GameField extends SurfaceView implements Runnable {
         return startingCountdown;
     }
 
-    void setTimeAfterPause() {
-        psec = System.currentTimeMillis();
-    }
-
     // обновление игры
     private void update() {
-        long sec = System.currentTimeMillis();
-        delta = sec - psec;
-        psec = sec;
         capSpeed = settings.height / 1560d;
         if (!isAnimation & !startingCountdown & !pause) {
             checkCollision();
@@ -311,36 +321,27 @@ public class GameField extends SurfaceView implements Runnable {
             puck.v.x = -puck.v.x;
         }
         // проверка столкновения с битой
-        for (int i = 0; i < 2; i++) {
-            double plx1, ply1, plx2, ply2, px, py;
-            plx1 = player1.x + player1.v.x * delta / 6 * i;
-            ply1 = player1.y + player1.v.y * delta / 6 * i;
-            plx2 = player2.x + player2.v.x * delta / 6 * i;
-            ply2 = player2.y + player2.v.y * delta / 6 * i;
-            px = puck.x + puck.v.x * delta / 6 * i;
-            py = puck.y + puck.v.y * delta / 6 * i;
-            if ((length(px, py, plx1, ply1) < settings.playerScale + settings.puckScale - 5) & !isCollision1) {
-                if (ply1 <= py) {
-                    collision(player1.v, Math.acos((px - plx1) / length(px, py, plx1, ply1)), true);
-                } else {
-                    collision(player1.v, Math.acos((plx1 - px) / length(px, py, plx1, ply1)), true);
-                }
-                isCollision1 = true;
+        if ((length(puck.x, puck.y, player1.x, player1.y) < settings.playerScale + settings.puckScale - 5) & !isCollision1) {
+            if (player1.y <= puck.y) {
+                collision(player1.v, Math.acos((puck.x - player1.x) / length(puck.x, puck.y, player1.x, player1.y)), true);
+            } else {
+                collision(player1.v, Math.acos((player1.x - puck.x) / length(puck.x, puck.y, player1.x, player1.y)), true);
             }
-            if (!(length(px, py, plx1, ply1) < settings.playerScale + settings.puckScale - 5)) {
-                isCollision1 = false;
+            isCollision1 = true;
+        }
+        if (!(length(puck.x, puck.y, player1.x, player1.y) < settings.playerScale + settings.puckScale - 5)) {
+            isCollision1 = false;
+        }
+        if ((length(puck.x, puck.y, player2.x, player2.y) < settings.playerScale + settings.puckScale - 5) & !isCollision2) {
+            if (player2.y <= puck.y) {
+                collision(player2.v, Math.acos((puck.x - player2.x) / length(puck.x, puck.y, player2.x, player2.y)), true);
+            } else {
+                collision(player2.v, Math.acos((player2.x - puck.x) / length(puck.x, puck.y, player2.x, player2.y)), true);
             }
-            if ((length(px, py, plx2, ply2) < settings.playerScale + settings.puckScale - 5) & !isCollision2) {
-                if (ply2 <= py) {
-                    collision(player2.v, Math.acos((px - plx2) / length(px, py, plx2, ply2)), true);
-                } else {
-                    collision(player2.v, Math.acos((plx2 - px) / length(px, py, plx2, ply2)), true);
-                }
-                isCollision2 = true;
-            }
-            if (!(length(px, py, plx2, ply2) < settings.playerScale + settings.puckScale - 5)) {
-                isCollision2 = false;
-            }
+            isCollision2 = true;
+        }
+        if (!(length(puck.x, puck.y, player2.x, player2.y) < settings.playerScale + settings.puckScale - 5)) {
+            isCollision2 = false;
         }
     }
 
@@ -393,11 +394,14 @@ public class GameField extends SurfaceView implements Runnable {
     @Override
     public void run() {
         while (draw) {
-            if (holder.getSurface().isValid()) {
-                Canvas canvas = holder.lockCanvas();
+            sec = System.currentTimeMillis();
+            delta = sec - psec;
+            if (delta >= 1000 / settings.UPS) {
                 update();
-                drawOnCanvas(canvas);
-                holder.unlockCanvasAndPost(canvas);
+                psec = sec;
+            }
+            if (!isGraphicalThreadRunning) {
+                isGraphicalThreadRunning = true;
             }
         }
     }
@@ -429,8 +433,8 @@ public class GameField extends SurfaceView implements Runnable {
                 pointF.x = event.getX(pointerIndex);
                 pointF.y = event.getY(pointerIndex);
                 activePointers.put(pointerId, pointF);
-                x = (int) pointF.x;
-                y = (int) pointF.y;
+                x = pointF.x;
+                y = pointF.y;
                 if (pause) {
                     if (play.isClicked(x, y)) {
                         pause = false;
@@ -460,12 +464,12 @@ public class GameField extends SurfaceView implements Runnable {
                         point.x = event.getX(i);
                         point.y = event.getY(i);
                         if (isDragging1 & (pointerId == dragPointer1) & multiplayer) {
-                            player1.x = (int) point.x;
-                            player1.y = (int) point.y;
+                            player1.x = point.x;
+                            player1.y = point.y;
                         }
                         if (isDragging2 & (pointerId == dragPointer2)) {
-                            player2.x = (int) point.x;
-                            player2.y = (int) point.y;
+                            player2.x = point.x;
+                            player2.y = point.y;
                         }
                     }
                 }
@@ -506,6 +510,7 @@ public class GameField extends SurfaceView implements Runnable {
         draw = false;
         try {
             thread.join();
+            graphicalThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -514,6 +519,9 @@ public class GameField extends SurfaceView implements Runnable {
     public void resumeDrawing() {
         draw = true;
         thread = new Thread(this);
+        graphicalThread = new Thread(graphicalRunnable);
+        psec = System.currentTimeMillis();
         thread.start();
+        graphicalThread.start();
     }
 }

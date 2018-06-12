@@ -26,6 +26,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private final Context context;
     private final SurfaceHolder holder;
     private final SharedPreferences preferences;
+    private final Paint paint;
     private Thread thread;
     private boolean isDrawing, isSpeedSet, animStop, multiplayer, modeClicked;
     private Bitmap background;
@@ -35,7 +36,6 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private long psec, modeTime;
     private String multiplayerText;
     private Button start, puckLeft, puckRight, player1Left, player1Right, player2Left, player2Right, mode;
-    private final Paint paint;
 
     public GameCustomField(Context context) {
         super(context);

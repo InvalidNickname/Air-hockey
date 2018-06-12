@@ -17,7 +17,7 @@ class Button {
         this.bottom = bottom;
         normal = VectorDrawableCompat.create(context.getResources(), resId, null);
         pressed = VectorDrawableCompat.create(context.getResources(), pressedResId, null);
-        if (normal != null & pressed!= null) {
+        if (normal != null & pressed != null) {
             normal.setBounds(left, top, right, bottom);
             pressed.setBounds(left, top, right, bottom);
         }
@@ -30,7 +30,7 @@ class Button {
         this.bottom = bottom;
         normal = VectorDrawableCompat.create(context.getResources(), resId, null);
         pressed = VectorDrawableCompat.create(context.getResources(), resId, null);
-        if (normal != null & pressed!= null) {
+        if (normal != null & pressed != null) {
             normal.setBounds(left, top, right, bottom);
             pressed.setBounds(left, top, right, bottom);
         }
@@ -48,7 +48,7 @@ class Button {
         isPressed = bool;
     }
 
-    boolean isClicked(int x, int y) {
+    boolean isClicked(double x, double y) {
         return (y >= top & y <= bottom & x >= left & x <= right);
     }
 }

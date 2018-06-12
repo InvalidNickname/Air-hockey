@@ -8,7 +8,7 @@ import android.view.Display;
 final class Settings {
 
     final double frictionValue;
-    final int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers, goalThreshold, modeChangeTime;
+    final int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers, goalThreshold, modeChangeTime, UPS;
     final float baseVolume;
     final boolean friction;
 
@@ -30,5 +30,6 @@ final class Settings {
         numberOfPucks = context.getResources().getInteger(R.integer.number_of_pucks) - 1;
         numberOfPlayers = context.getResources().getInteger(R.integer.number_of_players) - 1;
         modeChangeTime = context.getResources().getInteger(R.integer.mode_change_time);
+        UPS = context.getResources().getInteger(R.integer.max_ups);
     }
 }

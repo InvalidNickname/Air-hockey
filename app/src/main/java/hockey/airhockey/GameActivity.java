@@ -18,7 +18,7 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         gameField = new GameField(GameActivity.this);
         Intent intent = getIntent();
-        gameField.setMultiplayer(intent.getBooleanExtra("multiplayer",true));
+        gameField.setMultiplayer(intent.getBooleanExtra("multiplayer", true));
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setContentView(gameField);
         overridePendingTransition(0, 0);
@@ -40,7 +40,6 @@ public class GameActivity extends AppCompatActivity {
         super.onResume();
         gameField.resumeDrawing();
         hideSystemUI();
-        gameField.setTimeAfterPause();
     }
 
     @Override
