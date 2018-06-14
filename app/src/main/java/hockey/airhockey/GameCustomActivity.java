@@ -45,4 +45,10 @@ public class GameCustomActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        gameCustomField.releaseMemory();
+    }
 }

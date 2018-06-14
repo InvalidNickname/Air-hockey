@@ -49,4 +49,10 @@ public class GameActivity extends AppCompatActivity {
         }
         backPressed = System.currentTimeMillis();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        gameField.releaseMemory();
+    }
 }

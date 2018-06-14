@@ -1,7 +1,7 @@
 package hockey.airhockey;
 
-import android.app.Activity;
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 
@@ -13,7 +13,7 @@ final class Settings {
     final boolean friction;
 
     Settings(Context context) {
-        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        Display display = ((AppCompatActivity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getRealMetrics(metrics);
         width = metrics.widthPixels;

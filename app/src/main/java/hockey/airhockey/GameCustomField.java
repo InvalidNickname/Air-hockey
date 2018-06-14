@@ -16,7 +16,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import static hockey.airhockey.MainActivity.APP_PREFERENCES;
+import static hockey.airhockey.MainActivity.PAINT_FLAGS;
 import static hockey.airhockey.MainActivity.settings;
+import static hockey.airhockey.Utils.dpToPx;
 
 public class GameCustomField extends SurfaceView implements Runnable {
 
@@ -35,7 +37,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private Puck puck;
     private long psec, modeTime;
     private String multiplayerText;
-    private Button start, puckLeft, puckRight, player1Left, player1Right, player2Left, player2Right, mode;
+    private Button start, puckLeft, puckRight, player1Left, player1Right, player2Left, player2Right, mode, back;
 
     public GameCustomField(Context context) {
         super(context);
@@ -57,7 +59,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
         playerArray = new int[settings.numberOfPlayers + 1];
         playerArray[0] = R.drawable.player_default;
         playerArray[1] = R.drawable.player_black;
-        paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        paint = new Paint(PAINT_FLAGS);
         paint.setColor(Color.BLUE);
         findBestTextSize();
         paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
@@ -107,14 +109,15 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private void loadGraphics() {
         background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background);
         background = Bitmap.createScaledBitmap(background, settings.width, settings.height, true);
-        start = new Button(R.drawable.start_button, R.drawable.start_button_pressed, context, (int) (settings.width - 0.0419921875 * settings.height), settings.width, (int) (0.4375 * settings.height), (int) (0.5625 * settings.height));
-        mode = new Button(R.drawable.mode_button, R.drawable.mode_button_pressed, context, 0, (int) (0.0419921875 * settings.height), (int) (0.4375 * settings.height), (int) (0.5625 * settings.height));
-        puckLeft = new Button(R.drawable.arrow_left, context, (int) (settings.width / 2 - 1.7 * settings.playerScale - 20), settings.width / 2 - settings.playerScale - 20, (int) (settings.height / 2 - 0.7 * settings.playerScale), (int) (settings.height / 2 + 0.7 * settings.playerScale));
-        puckRight = new Button(R.drawable.arrow_right, context, settings.width / 2 + settings.playerScale + 20, (int) (settings.width / 2 + 1.7 * settings.playerScale + 20), (int) (settings.height / 2 - 0.7 * settings.playerScale), (int) (settings.height / 2 + 0.7 * settings.playerScale));
-        player1Left = new Button(R.drawable.arrow_left, context, (int) (settings.width / 2 - 1.7 * settings.playerScale - 20), settings.width / 2 - settings.playerScale - 20, (int) (0.7 * settings.playerScale), (int) (2.1 * settings.playerScale));
-        player1Right = new Button(R.drawable.arrow_right, context, settings.width / 2 + settings.playerScale + 20, (int) (settings.width / 2 + 1.7 * settings.playerScale + 20), (int) (0.7 * settings.playerScale), (int) (2.1 * settings.playerScale));
-        player2Left = new Button(R.drawable.arrow_left, context, (int) (settings.width / 2 - 1.7 * settings.playerScale - 20), settings.width / 2 - settings.playerScale - 20, (int) (settings.height - 2.1 * settings.playerScale), (int) (settings.height - 0.7 * settings.playerScale));
-        player2Right = new Button(R.drawable.arrow_right, context, settings.width / 2 + settings.playerScale + 20, (int) (settings.width / 2 + 1.7 * settings.playerScale + 20), (int) (settings.height - 2.1 * settings.playerScale), (int) (settings.height - 0.7 * settings.playerScale));
+        back = new Button(R.drawable.arrow_back, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
+        start = new Button(R.drawable.start_button, R.drawable.start_button_pressed, context, (int) (settings.width - 0.0419921875 * settings.height), settings.width, (int) (0.4375 * settings.height), (int) (0.5625 * settings.height), 0);
+        mode = new Button(R.drawable.mode_button, R.drawable.mode_button_pressed, context, 0, (int) (0.0419921875 * settings.height), (int) (0.4375 * settings.height), (int) (0.5625 * settings.height), 0);
+        puckLeft = new Button(R.drawable.arrow_left, context, (int) (settings.width / 2 - 1.7 * settings.playerScale - 20), settings.width / 2 - settings.playerScale - 20, (int) (settings.height / 2 - 0.7 * settings.playerScale), (int) (settings.height / 2 + 0.7 * settings.playerScale), 0);
+        puckRight = new Button(R.drawable.arrow_right, context, settings.width / 2 + settings.playerScale + 20, (int) (settings.width / 2 + 1.7 * settings.playerScale + 20), (int) (settings.height / 2 - 0.7 * settings.playerScale), (int) (settings.height / 2 + 0.7 * settings.playerScale), 0);
+        player1Left = new Button(R.drawable.arrow_left, context, (int) (settings.width / 2 - 1.7 * settings.playerScale - 20), settings.width / 2 - settings.playerScale - 20, (int) (0.7 * settings.playerScale), (int) (2.1 * settings.playerScale), 0);
+        player1Right = new Button(R.drawable.arrow_right, context, settings.width / 2 + settings.playerScale + 20, (int) (settings.width / 2 + 1.7 * settings.playerScale + 20), (int) (0.7 * settings.playerScale), (int) (2.1 * settings.playerScale), 0);
+        player2Left = new Button(R.drawable.arrow_left, context, (int) (settings.width / 2 - 1.7 * settings.playerScale - 20), settings.width / 2 - settings.playerScale - 20, (int) (settings.height - 2.1 * settings.playerScale), (int) (settings.height - 0.7 * settings.playerScale), 0);
+        player2Right = new Button(R.drawable.arrow_right, context, settings.width / 2 + settings.playerScale + 20, (int) (settings.width / 2 + 1.7 * settings.playerScale + 20), (int) (settings.height - 2.1 * settings.playerScale), (int) (settings.height - 0.7 * settings.playerScale), 0);
         player1 = new Player(playerArray[player1Chosen], context, 1);
         player1.x = settings.width + settings.playerScale * 2;
         player2 = new Player(playerArray[player2Chosen], context, 2);
@@ -153,6 +156,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
                 modeClicked = false;
             }
         }
+        back.draw(canvas);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -167,6 +171,11 @@ public class GameCustomField extends SurfaceView implements Runnable {
                 }
                 if (mode.isClicked(x, y)) {
                     mode.setPressed(true);
+                }
+                if (back.isClicked(x, y)) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    context.startActivity(intent);
                 }
                 if (puckLeft.isClicked(x, y)) {
                     puckChosen -= 1;
@@ -220,7 +229,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
                 int y = (int) event.getY();
                 if (start.isClicked(x, y)) {
                     Intent intent = new Intent(context, GameActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.putExtra("multiplayer", multiplayer);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(APP_PREFERENCES_MULTIPLAYER, multiplayer);
@@ -262,6 +271,10 @@ public class GameCustomField extends SurfaceView implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void releaseMemory() {
+        background.recycle();
     }
 
     public void resumeDrawing() {

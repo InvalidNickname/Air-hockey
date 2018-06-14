@@ -76,7 +76,6 @@
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/aboutText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
@@ -93,7 +92,6 @@
     </ScrollView>
 
     <ImageView
-        android:id="@+id/backButton"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:onClick="back"

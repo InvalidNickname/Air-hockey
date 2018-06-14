@@ -17,7 +17,6 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.SparseArray;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -29,8 +28,11 @@ import static hockey.airhockey.GameCustomField.player2Chosen;
 import static hockey.airhockey.GameCustomField.playerArray;
 import static hockey.airhockey.GameCustomField.puckArray;
 import static hockey.airhockey.GameCustomField.puckChosen;
+import static hockey.airhockey.MainActivity.PAINT_FLAGS;
 import static hockey.airhockey.MainActivity.settings;
 import static hockey.airhockey.MainActivity.volume;
+import static hockey.airhockey.Utils.calculateLength;
+import static hockey.airhockey.Utils.dpToPx;
 
 public class GameField extends SurfaceView implements Runnable {
 
@@ -38,7 +40,7 @@ public class GameField extends SurfaceView implements Runnable {
     private final SurfaceHolder holder;
     private final SoundPool soundPool;
     private final int[] hitSound = new int[5];
-    private final Paint paint, countdownPaint;
+    private final Paint paint, countdownPaint, bitmapPaint;
     private final Path path;
     private final Rect bounds;
     private final Runnable graphicalRunnable;
@@ -91,15 +93,10 @@ public class GameField extends SurfaceView implements Runnable {
         count1 = 0;
         count2 = 0;
         turn = Math.round(Math.random()) + 1;
-        paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
-        paint.setColor(Color.BLUE);
-        paint.setTextSize(settings.height / 3.5f);
-        paint.setAlpha(50);
-        paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
-        countdownPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
-        countdownPaint.setColor(ContextCompat.getColor(context, R.color.countdownText));
-        countdownPaint.setTextSize(settings.height / 3f);
-        countdownPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
+        paint = new Paint(PAINT_FLAGS);
+        countdownPaint = new Paint(PAINT_FLAGS);
+        bitmapPaint = new Paint(PAINT_FLAGS);
+        setPaint();
         startingCountdown = true;
         loadingGame = true;
         startGame();
@@ -117,6 +114,16 @@ public class GameField extends SurfaceView implements Runnable {
 
     boolean isAbleToPause() {
         return startingCountdown;
+    }
+
+    private void setPaint() {
+        paint.setColor(Color.BLUE);
+        paint.setTextSize(settings.height / 3.5f);
+        paint.setAlpha(50);
+        paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
+        countdownPaint.setColor(ContextCompat.getColor(context, R.color.countdownText));
+        countdownPaint.setTextSize(settings.height / 3f);
+        countdownPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
     }
 
     // обновление игры
@@ -211,6 +218,7 @@ public class GameField extends SurfaceView implements Runnable {
 
     // загрузка звуков
     private void loadMusic() throws IOException {
+        // после загрузки всех 7 звуков начинается игра
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int i, int i1) {
@@ -230,14 +238,10 @@ public class GameField extends SurfaceView implements Runnable {
         countdownSound = soundPool.load(context.getAssets().openFd("sounds/countdown.wav"), 1);
     }
 
-    private int dpToPx(float dp) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
-    }
-
     // загрузка графики
     private void loadGraphics() {
-        play = new Button(R.drawable.play_circle_orange, context, (int) (0.4 * settings.width), (int) (0.6 * settings.width), (int) (settings.height / 2 - 0.1 * settings.width), (int) (settings.height / 2 + 0.1 * settings.width));
-        back = new Button(R.drawable.arrow_back_orange, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32));
+        play = new Button(R.drawable.play_circle_orange, context, (int) (0.4 * settings.width), (int) (0.6 * settings.width), (int) (settings.height / 2 - 0.1 * settings.width), (int) (settings.height / 2 + 0.1 * settings.width), 0);
+        back = new Button(R.drawable.arrow_back_orange, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
         background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background);
         background = Bitmap.createScaledBitmap(background, settings.width, settings.height, true);
         player1 = new Player(playerArray[player1Chosen], context, 1);
@@ -253,7 +257,7 @@ public class GameField extends SurfaceView implements Runnable {
 
     // рисование
     private void drawOnCanvas(Canvas canvas) {
-        canvas.drawBitmap(background, 0, 0, new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG));
+        canvas.drawBitmap(background, 0, 0, bitmapPaint);
         lowerGate.draw(canvas);
         upperGate.draw(canvas);
         paint.getTextBounds(String.valueOf(count1), 0, 1, bounds);
@@ -281,26 +285,21 @@ public class GameField extends SurfaceView implements Runnable {
         }
     }
 
-    // нахождение расстояния между двумя точками
-    private double length(double x1, double y1, double x2, double y2) {
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-    }
-
     // проверка столковения шайбы
     private void checkCollision() {
         // проверка столкновения с верхней/нижней стенкой, пролетит ли в ворота
         if (puck.x < upperGate.rightCorner & puck.x > upperGate.leftCorner) {
             if (puck.y < settings.puckScale) {
-                if (length(puck.x, puck.y, lowerGate.leftCorner, 0) < settings.playerScale) {
-                    collision(new Vector(0, 0), Math.acos((puck.x - lowerGate.leftCorner) / length(puck.x, puck.y, lowerGate.leftCorner, 0)), false);
-                } else if (length(puck.x, puck.y, lowerGate.rightCorner, 0) < settings.playerScale) {
-                    collision(new Vector(0, 0), Math.acos((puck.x - lowerGate.rightCorner) / length(puck.x, puck.y, lowerGate.rightCorner, 0)), false);
+                if (calculateLength(puck.x, puck.y, lowerGate.leftCorner, 0) < settings.playerScale) {
+                    collision(new Vector(0, 0), Math.acos((puck.x - lowerGate.leftCorner) / calculateLength(puck.x, puck.y, lowerGate.leftCorner, 0)), false);
+                } else if (calculateLength(puck.x, puck.y, lowerGate.rightCorner, 0) < settings.playerScale) {
+                    collision(new Vector(0, 0), Math.acos((puck.x - lowerGate.rightCorner) / calculateLength(puck.x, puck.y, lowerGate.rightCorner, 0)), false);
                 }
             } else if (puck.y > settings.height - settings.puckScale) {
-                if (length(puck.x, puck.y, upperGate.leftCorner, settings.height) < settings.playerScale) {
-                    collision(new Vector(0, 0), Math.acos((puck.x - upperGate.leftCorner) / length(puck.x, puck.y, upperGate.leftCorner, settings.height)), false);
-                } else if (length(puck.x, puck.y, upperGate.rightCorner, settings.height) < settings.playerScale) {
-                    collision(new Vector(0, 0), Math.acos((puck.x - upperGate.rightCorner) / length(puck.x, puck.y, upperGate.rightCorner, settings.height)), false);
+                if (calculateLength(puck.x, puck.y, upperGate.leftCorner, settings.height) < settings.playerScale) {
+                    collision(new Vector(0, 0), Math.acos((puck.x - upperGate.leftCorner) / calculateLength(puck.x, puck.y, upperGate.leftCorner, settings.height)), false);
+                } else if (calculateLength(puck.x, puck.y, upperGate.rightCorner, settings.height) < settings.playerScale) {
+                    collision(new Vector(0, 0), Math.acos((puck.x - upperGate.rightCorner) / calculateLength(puck.x, puck.y, upperGate.rightCorner, settings.height)), false);
                 }
             }
         } else {
@@ -320,34 +319,36 @@ public class GameField extends SurfaceView implements Runnable {
             puck.x = settings.width - settings.puckScale;
             puck.v.x = -puck.v.x;
         }
-        // проверка столкновения с битой
-        if ((length(puck.x, puck.y, player1.x, player1.y) < settings.playerScale + settings.puckScale - 5) & !isCollision1) {
+        // проверка столкновения с верхней битой
+        if ((calculateLength(puck.x, puck.y, player1.x, player1.y) < settings.playerScale + settings.puckScale - 5) & !isCollision1) {
             if (player1.y <= puck.y) {
-                collision(player1.v, Math.acos((puck.x - player1.x) / length(puck.x, puck.y, player1.x, player1.y)), true);
+                collision(player1.v, Math.acos((puck.x - player1.x) / calculateLength(puck.x, puck.y, player1.x, player1.y)), true);
             } else {
-                collision(player1.v, Math.acos((player1.x - puck.x) / length(puck.x, puck.y, player1.x, player1.y)), true);
+                collision(player1.v, Math.acos((player1.x - puck.x) / calculateLength(puck.x, puck.y, player1.x, player1.y)), true);
             }
             isCollision1 = true;
         }
-        if (!(length(puck.x, puck.y, player1.x, player1.y) < settings.playerScale + settings.puckScale - 5)) {
+        if (!(calculateLength(puck.x, puck.y, player1.x, player1.y) < settings.playerScale + settings.puckScale - 5)) {
             isCollision1 = false;
         }
-        if ((length(puck.x, puck.y, player2.x, player2.y) < settings.playerScale + settings.puckScale - 5) & !isCollision2) {
+        // проверка столкновения с нижней битой
+        if ((calculateLength(puck.x, puck.y, player2.x, player2.y) < settings.playerScale + settings.puckScale - 5) & !isCollision2) {
             if (player2.y <= puck.y) {
-                collision(player2.v, Math.acos((puck.x - player2.x) / length(puck.x, puck.y, player2.x, player2.y)), true);
+                collision(player2.v, Math.acos((puck.x - player2.x) / calculateLength(puck.x, puck.y, player2.x, player2.y)), true);
             } else {
-                collision(player2.v, Math.acos((player2.x - puck.x) / length(puck.x, puck.y, player2.x, player2.y)), true);
+                collision(player2.v, Math.acos((player2.x - puck.x) / calculateLength(puck.x, puck.y, player2.x, player2.y)), true);
             }
             isCollision2 = true;
         }
-        if (!(length(puck.x, puck.y, player2.x, player2.y) < settings.playerScale + settings.puckScale - 5)) {
+        if (!(calculateLength(puck.x, puck.y, player2.x, player2.y) < settings.playerScale + settings.puckScale - 5)) {
             isCollision2 = false;
         }
     }
 
     // движение верхней биты, если игра против ИИ
     private void moveBot() {
-        if (puck.y - settings.puckScale < settings.height / 2 & length(puck.x, puck.y, player1.x, player1.y) >= settings.playerScale + settings.puckScale - 5) {
+        if (puck.y - settings.puckScale < settings.height / 2 & calculateLength(puck.x, puck.y, player1.x, player1.y) >= settings.playerScale + settings.puckScale - 5) {
+            // движение к шайбе, если она на верхней половине поля
             double y = capSpeed / Math.sqrt(Math.pow((puck.x - player1.x) / (puck.y - player1.y), 2) + 1);
             if (puck.y < player1.y) {
                 y = -Math.abs(y);
@@ -357,7 +358,8 @@ public class GameField extends SurfaceView implements Runnable {
                 x = -Math.abs(x);
             }
             player1.v.setVector(x, y);
-        } else if (length(player1.x, player1.y, settings.width / 2, (int) (1.4 * settings.playerScale)) > player1.v.v * delta) {
+        } else if (calculateLength(player1.x, player1.y, settings.width / 2, (int) (1.4 * settings.playerScale)) > player1.v.v * delta) {
+            // движение к стратовой позиции, если шайба не на верхней половине поля
             double y = capSpeed / Math.sqrt(Math.pow((settings.width / 2 - player1.x) / ((int) (1.4 * settings.playerScale) - player1.y), 2) + 1);
             if (1.4 * settings.playerScale < player1.y) {
                 y = -Math.abs(y);
@@ -368,6 +370,7 @@ public class GameField extends SurfaceView implements Runnable {
             }
             player1.v.setVector(x, y);
         } else {
+            // остановка, если достиг стартовой позиции
             player1.v.setVector(0, 0);
             player1.x = settings.width / 2;
             player1.y = (int) (1.4 * settings.playerScale);
@@ -394,6 +397,7 @@ public class GameField extends SurfaceView implements Runnable {
     @Override
     public void run() {
         while (draw) {
+            // расчёт физики выполняется UPS раз в секунду
             sec = System.currentTimeMillis();
             delta = sec - psec;
             if (delta >= 1000 / settings.UPS) {
@@ -435,16 +439,18 @@ public class GameField extends SurfaceView implements Runnable {
                 activePointers.put(pointerId, pointF);
                 x = pointF.x;
                 y = pointF.y;
+                // нажатие на кнопки "продолжить" и "выйти" возможно только во время паузы
                 if (pause) {
                     if (play.isClicked(x, y)) {
                         pause = false;
                     }
                     if (back.isClicked(x, y)) {
                         Intent intent = new Intent(context, GameCustomActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         context.startActivity(intent);
                     }
                 }
+                // двигать верхней битой можно только при мультиплеере
                 if (isInside(player1.x, player1.y) & multiplayer) {
                     isDragging1 = true;
                     dragPointer1 = pointerId;
@@ -514,6 +520,10 @@ public class GameField extends SurfaceView implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void releaseMemory() {
+        background.recycle();
     }
 
     public void resumeDrawing() {
