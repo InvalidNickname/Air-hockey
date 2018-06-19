@@ -1,5 +1,8 @@
 package hockey.airhockey;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +13,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -35,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isAnimation;
     private SharedPreferences preferences;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
@@ -49,6 +54,32 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         start = findViewById(R.id.start);
         credits = findViewById(R.id.credits);
+        start.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    startDecrementAnimation(start);
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    startIncrementAnimation(start);
+                }
+                return false;
+            }
+        });
+        credits.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    startDecrementAnimation(credits);
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    startIncrementAnimation(credits);
+                }
+                return false;
+            }
+        });
         TextView versionText = findViewById(R.id.version);
         String versionName = "unknown";
         try {
@@ -77,6 +108,18 @@ public class MainActivity extends AppCompatActivity {
         hideSystemUI();
     }
 
+    private void startDecrementAnimation(View view) {
+        AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.small_decrement);
+        set.setTarget(view);
+        set.start();
+    }
+
+    private void startIncrementAnimation(View view) {
+        AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.small_increment);
+        set.setTarget(view);
+        set.start();
+    }
+
     private void drawGates() {
         ImageView upperGate = findViewById(R.id.upper_gate);
         ImageView lowerGate = findViewById(R.id.lower_gate);
@@ -96,71 +139,53 @@ public class MainActivity extends AppCompatActivity {
         lowerGate.setLayoutParams(lowerParams);
     }
 
-    public void startGame(View view) {
+    public void onClick(View view) {
         if (!isAnimation) {
-            left.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    isAnimation = true;
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    start.setVisibility(GONE);
-                    credits.setVisibility(GONE);
-                    Intent intent = new Intent(MainActivity.this, GameCustomActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            start.startAnimation(left);
-            credits.startAnimation(right);
+            switch (view.getId()) {
+                case R.id.start: // нажатие на кнопку старта
+                    setAnimationListener(new Intent(MainActivity.this, GameCustomActivity.class));
+                    break;
+                case R.id.credits: // нажатие на кнопку инфо
+                    setAnimationListener(new Intent(MainActivity.this, CreditsActivity.class));
+                    break;
+                case R.id.volumeButton: // нажатие на кнопку изменения громкости
+                    if (volume == 1) {
+                        volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.volume_off, null));
+                    } else {
+                        volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.volume_up, null));
+                    }
+                    volume = ++volume % 2;
+                    break;
+            }
         }
     }
 
-    public void openCredits(View view) {
-        if (!isAnimation) {
-            left.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    isAnimation = true;
-                }
+    private void setAnimationListener(final Intent intent) {
+        left.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                isAnimation = true;
+            }
 
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    start.setVisibility(GONE);
-                    credits.setVisibility(GONE);
-                    Intent intent = new Intent(MainActivity.this, CreditsActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                start.setVisibility(GONE);
+                credits.setVisibility(GONE);
+                startActivity(intent);
+                finish();
+            }
 
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            start.startAnimation(left);
-            credits.startAnimation(right);
-        }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+        start.startAnimation(left);
+        credits.startAnimation(right);
     }
 
     @Override
     public void onBackPressed() {
         finishAffinity();
-    }
-
-    public void changeVolume(View view) {
-        if (volume == 1) {
-            volume = 0;
-            volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.volume_off, null));
-        } else {
-            volume = 1;
-            volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.volume_up, null));
-        }
     }
 
     @Override

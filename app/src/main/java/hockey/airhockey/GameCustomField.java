@@ -107,7 +107,9 @@ public class GameCustomField extends SurfaceView implements Runnable {
 
     // загрузка графики
     private void loadGraphics() {
-        background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background, options);
         background = Bitmap.createScaledBitmap(background, settings.width, settings.height, true);
         back = new Button(R.drawable.arrow_back, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
         start = new Button(R.drawable.start_button, R.drawable.start_button_pressed, context, (int) (settings.width - 0.0419921875 * settings.height), settings.width, (int) (0.4375 * settings.height), (int) (0.5625 * settings.height), 0);

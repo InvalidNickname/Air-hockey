@@ -86,29 +86,56 @@
             android:id="@+id/menuButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:onClick="goToMenu"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="3:1"
-            app:layout_constraintEnd_toStartOf="@+id/restartButton"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/winText"
+            android:onClick="onClick"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="@+id/restart"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/space"
+            app:layout_constraintStart_toEndOf="@id/space3"
+            app:layout_constraintTop_toTopOf="@+id/restart"
             app:srcCompat="@drawable/menu_button"
             tools:ignore="ContentDescription" />
 
         <ImageView
-            android:id="@+id/restartButton"
+            android:id="@+id/restart"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:onClick="restartGame"
+            android:onClick="onClick"
+            android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="3:1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/menuButton"
-            app:layout_constraintTop_toTopOf="@+id/menuButton"
-            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/space2"
+            app:layout_constraintStart_toEndOf="@id/space"
+            app:layout_constraintTop_toBottomOf="@id/winText"
             app:srcCompat="@drawable/replay"
             tools:ignore="ContentDescription" />
+
+        <Space
+            android:id="@+id/space"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/restart"
+            app:layout_constraintEnd_toStartOf="@+id/restart"
+            app:layout_constraintStart_toEndOf="@+id/menuButton"
+            app:layout_constraintTop_toTopOf="@+id/restart" />
+
+        <Space
+            android:id="@+id/space2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/restart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/restart"
+            app:layout_constraintTop_toTopOf="@+id/restart" />
+
+        <Space
+            android:id="@+id/space3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/menuButton"
+            app:layout_constraintEnd_toStartOf="@+id/menuButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/menuButton" />
 
     </android.support.constraint.ConstraintLayout>
 

@@ -1,6 +1,7 @@
 package hockey.airhockey;
 
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Space;
 
+import java.io.IOException;
+
 import static hockey.airhockey.MainActivity.HIDE_FLAGS;
 import static hockey.airhockey.MainActivity.settings;
 import static hockey.airhockey.MainActivity.volume;
@@ -24,7 +27,6 @@ public class CreditsActivity extends AppCompatActivity {
     private Runnable runnable;
     private boolean isRunning;
     private long sec;
-    private int current;
     private MediaPlayer mediaPlayer;
 
     @Override
@@ -41,11 +43,18 @@ public class CreditsActivity extends AppCompatActivity {
                 }
             }
         };
+        // поток для прокрутки титров
         thread = new Thread(runnable);
         setContentView(R.layout.activity_credits);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         mediaPlayer = new MediaPlayer();
-        mediaPlayer = MediaPlayer.create(this, R.raw.night_runner);
+        try {
+            AssetFileDescriptor afd = getAssets().openFd("music/night_runner.mp3");
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         mediaPlayer.setVolume(settings.baseVolume * volume, settings.baseVolume * volume);
         mediaPlayer.setLooping(true);
         overridePendingTransition(0, 0);
@@ -72,13 +81,7 @@ public class CreditsActivity extends AppCompatActivity {
         thread.start();
         isRunning = true;
         hideSystemUI();
-        mediaPlayer.seekTo(current);
-        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
-            @Override
-            public void onSeekComplete(MediaPlayer mediaPlayer) {
-                mediaPlayer.start();
-            }
-        });
+        mediaPlayer.start();
     }
 
     @Override
@@ -91,7 +94,6 @@ public class CreditsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         if (mediaPlayer.isPlaying()) {
-            current = mediaPlayer.getCurrentPosition();
             mediaPlayer.pause();
         }
     }

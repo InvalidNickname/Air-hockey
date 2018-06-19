@@ -44,6 +44,7 @@ public class GameField extends SurfaceView implements Runnable {
     private final Path path;
     private final Rect bounds;
     private final Runnable graphicalRunnable;
+    private final BitmapFactory.Options options;
     private int goalSound, countdownSound;
     private boolean pause, multiplayer, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame;
     private Bitmap background;
@@ -99,6 +100,8 @@ public class GameField extends SurfaceView implements Runnable {
         setPaint();
         startingCountdown = true;
         loadingGame = true;
+        options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
         startGame();
         thread.start();
         graphicalThread.start();
@@ -145,6 +148,7 @@ public class GameField extends SurfaceView implements Runnable {
             player2.update(delta, isAnimation);
             puck.update(delta, isAnimation);
         }
+        // проверка завершения анимации после гола
         if (isAnimation & puck.v.y >= 0 & turn == 1 & puck.y >= settings.height / 3) {
             startGame();
         } else if (isAnimation & puck.v.y <= 0 & turn == 1 & puck.y <= settings.height / 3) {
@@ -155,6 +159,7 @@ public class GameField extends SurfaceView implements Runnable {
         } else if (isAnimation & puck.v.y <= 0 & turn == 2 & puck.y <= settings.height * (2 / 3d)) {
             startGame();
         }
+        // проверка заершения стартового отсчёта
         if (!loadingGame) {
             if (sec - startTime > 3000 & startingCountdown) {
                 startingCountdown = false;
@@ -173,7 +178,7 @@ public class GameField extends SurfaceView implements Runnable {
         }
     }
 
-    // проверка победителя
+    // проверка победителя и завершения игры
     private void checkWinner() {
         if (count1 >= settings.goalThreshold) {
             Intent intent = new Intent(context, WinActivity.class);
@@ -206,7 +211,6 @@ public class GameField extends SurfaceView implements Runnable {
         activePointers = new SparseArray<>();
         isCollision1 = false;
         isCollision2 = false;
-        psec = System.currentTimeMillis();
         loadGraphics();
         if (turn == 1) {
             turn = 2;
@@ -214,6 +218,7 @@ public class GameField extends SurfaceView implements Runnable {
             turn = 1;
         }
         isAnimation = false;
+        psec = System.currentTimeMillis();
     }
 
     // загрузка звуков
@@ -222,7 +227,7 @@ public class GameField extends SurfaceView implements Runnable {
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int i, int i1) {
-                if (i == 7) {
+                if (i == countdownSound & i1 == 0) {
                     soundPool.play(countdownSound, volume, volume, 0, 0, 1);
                     startTime = System.currentTimeMillis();
                     loadingGame = false;
@@ -242,7 +247,7 @@ public class GameField extends SurfaceView implements Runnable {
     private void loadGraphics() {
         play = new Button(R.drawable.play_circle_orange, context, (int) (0.4 * settings.width), (int) (0.6 * settings.width), (int) (settings.height / 2 - 0.1 * settings.width), (int) (settings.height / 2 + 0.1 * settings.width), 0);
         back = new Button(R.drawable.arrow_back_orange, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
-        background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background);
+        background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background, options);
         background = Bitmap.createScaledBitmap(background, settings.width, settings.height, true);
         player1 = new Player(playerArray[player1Chosen], context, 1);
         player2 = new Player(playerArray[player2Chosen], context, 2);
