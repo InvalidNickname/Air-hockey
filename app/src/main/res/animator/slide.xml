@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by Alexey Kiselev
+  ~ Copyright (c) 2018 . All rights reserved.
+  ~ Last modified 30.06.18 16:57
+  -->
+
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="700"
+    android:interpolator="@android:anim/decelerate_interpolator"
+    android:propertyName="x"
+    android:valueType="floatType" />

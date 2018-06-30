@@ -1,3 +1,9 @@
+/*
+ * Created by Alexey Kiselev
+ * Copyright (c) 2018 . All rights reserved.
+ * Last modified 30.06.18 15:18
+ */
+
 package hockey.airhockey;
 
 import android.content.Intent;
@@ -69,8 +75,7 @@ public class CreditsActivity extends AppCompatActivity {
     }
 
     private void hideSystemUI() {
-        View view = getWindow().getDecorView();
-        view.setSystemUiVisibility(HIDE_FLAGS);
+        getWindow().getDecorView().setSystemUiVisibility(HIDE_FLAGS);
     }
 
     @Override
@@ -121,19 +126,13 @@ public class CreditsActivity extends AppCompatActivity {
     private void drawGates() {
         ImageView upperGate = findViewById(R.id.upperGate);
         ImageView lowerGate = findViewById(R.id.lowerGate);
-        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (settings.width * 0.74) - (int) (settings.width * 0.26), settings.gateHeight);
-        upperParams.leftToLeft = R.id.mainCredits;
-        upperParams.rightToRight = R.id.mainCredits;
-        upperParams.topToTop = R.id.mainCredits;
-        upperParams.bottomToBottom = R.id.mainCredits;
-        upperParams.verticalBias = 0;
+        ConstraintLayout.LayoutParams upperParams = (ConstraintLayout.LayoutParams) upperGate.getLayoutParams();
+        upperParams.height = settings.gateHeight;
+        upperParams.width = (int) (settings.width * 0.74) - (int) (settings.width * 0.26);
         upperGate.setLayoutParams(upperParams);
-        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (settings.width * 0.74) - (int) (settings.width * 0.26), settings.gateHeight);
-        lowerParams.leftToLeft = R.id.mainCredits;
-        lowerParams.rightToRight = R.id.mainCredits;
-        lowerParams.topToTop = R.id.mainCredits;
-        lowerParams.bottomToBottom = R.id.mainCredits;
-        lowerParams.verticalBias = 1;
+        ConstraintLayout.LayoutParams lowerParams = (ConstraintLayout.LayoutParams) lowerGate.getLayoutParams();
+        lowerParams.height = settings.gateHeight;
+        lowerParams.width = (int) (settings.width * 0.74) - (int) (settings.width * 0.26);
         lowerGate.setLayoutParams(lowerParams);
     }
 

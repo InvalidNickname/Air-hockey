@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by Alexey Kiselev
+  ~ Copyright (c) 2018 . All rights reserved.
+  ~ Last modified 30.06.18 17:03
+  -->
+
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:layout_editor_absoluteY="25dp">
@@ -54,7 +59,7 @@
         android:scaleType="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/volume_up"
+        app:srcCompat="@drawable/ic_volume_up"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -68,7 +73,7 @@
         app:layout_constraintEnd_toStartOf="@id/space"
         app:layout_constraintStart_toEndOf="@id/space3"
         app:layout_constraintTop_toTopOf="@+id/credits"
-        app:srcCompat="@drawable/play_circle"
+        app:srcCompat="@drawable/ic_play_circle"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -82,7 +87,7 @@
         app:layout_constraintEnd_toStartOf="@id/space2"
         app:layout_constraintStart_toEndOf="@id/space"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/info"
+        app:srcCompat="@drawable/ic_info"
         tools:ignore="ContentDescription" />
 
     <Space

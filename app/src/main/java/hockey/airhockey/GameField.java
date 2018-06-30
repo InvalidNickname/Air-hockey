@@ -1,3 +1,9 @@
+/*
+ * Created by Alexey Kiselev
+ * Copyright (c) 2018 . All rights reserved.
+ * Last modified 30.06.18 19:57
+ */
+
 package hockey.airhockey;
 
 import android.annotation.SuppressLint;
@@ -46,7 +52,7 @@ public class GameField extends SurfaceView implements Runnable {
     private final Runnable graphicalRunnable;
     private final BitmapFactory.Options options;
     private int goalSound, countdownSound;
-    private boolean pause, multiplayer, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame;
+    private boolean pause, multiplayer, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame, firstWin;
     private Bitmap background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
@@ -100,6 +106,7 @@ public class GameField extends SurfaceView implements Runnable {
         setPaint();
         startingCountdown = true;
         loadingGame = true;
+        firstWin = true;
         options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
         startGame();
@@ -133,6 +140,7 @@ public class GameField extends SurfaceView implements Runnable {
     private void update() {
         capSpeed = settings.height / 1560d;
         if (!isAnimation & !startingCountdown & !pause) {
+            checkWinner();
             checkCollision();
             if (multiplayer) {
                 player1.setV(delta);
@@ -140,7 +148,6 @@ public class GameField extends SurfaceView implements Runnable {
                 moveBot();
             }
             player2.setV(delta);
-            checkWinner();
             checkGoal();
         }
         if (!startingCountdown & !pause) {
@@ -184,11 +191,15 @@ public class GameField extends SurfaceView implements Runnable {
             Intent intent = new Intent(context, WinActivity.class);
             intent.putExtra("winner", 1);
             intent.putExtra("multiplayer", multiplayer);
+            intent.putExtra("firstWin", firstWin);
+            firstWin = false;
             context.startActivity(intent);
         } else if (count2 >= settings.goalThreshold) {
             Intent intent = new Intent(context, WinActivity.class);
             intent.putExtra("winner", 2);
             intent.putExtra("multiplayer", multiplayer);
+            intent.putExtra("firstWin", firstWin);
+            firstWin = false;
             context.startActivity(intent);
         }
     }
@@ -245,8 +256,8 @@ public class GameField extends SurfaceView implements Runnable {
 
     // загрузка графики
     private void loadGraphics() {
-        play = new Button(R.drawable.play_circle_orange, context, (int) (0.4 * settings.width), (int) (0.6 * settings.width), (int) (settings.height / 2 - 0.1 * settings.width), (int) (settings.height / 2 + 0.1 * settings.width), 0);
-        back = new Button(R.drawable.arrow_back_orange, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
+        play = new Button(R.drawable.ic_play_circle_orange, context, (int) (0.4 * settings.width), (int) (0.6 * settings.width), (int) (settings.height / 2 - 0.1 * settings.width), (int) (settings.height / 2 + 0.1 * settings.width), 0);
+        back = new Button(R.drawable.ic_arrow_back_orange, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
         background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background, options);
         background = Bitmap.createScaledBitmap(background, settings.width, settings.height, true);
         player1 = new Player(playerArray[player1Chosen], context, 1);
@@ -272,6 +283,9 @@ public class GameField extends SurfaceView implements Runnable {
         canvas.drawTextOnPath(String.valueOf(count1), path, 0, 0, paint);
         paint.getTextBounds(String.valueOf(count2), 0, 1, bounds);
         canvas.drawText(String.valueOf(count2), (settings.width - paint.measureText(String.valueOf(count2))) / 2f, (settings.height * 1.475f + bounds.height()) / 2f, paint);
+        player1.drawShadow(canvas);
+        player2.drawShadow(canvas);
+        puck.drawShadow(canvas);
         player1.draw(canvas);
         player2.draw(canvas);
         puck.draw(canvas);

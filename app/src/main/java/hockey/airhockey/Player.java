@@ -1,3 +1,9 @@
+/*
+ * Created by Alexey Kiselev
+ * Copyright (c) 2018 . All rights reserved.
+ * Last modified 30.06.18 19:57
+ */
+
 package hockey.airhockey;
 
 import android.content.Context;
@@ -41,8 +47,11 @@ class Player {
     }
 
     void draw(Canvas canvas) {
-        canvas.drawBitmap(shadow, (int) (x - settings.playerScale - shadowSize), (int) (y - settings.playerScale - shadowSize), bitmapPaint);
         drawable.draw(canvas);
+    }
+
+    void drawShadow(Canvas canvas) {
+        canvas.drawBitmap(shadow, (int) (x - settings.playerScale - shadowSize), (int) (y - settings.playerScale - shadowSize), bitmapPaint);
     }
 
     void update(long delta, boolean isAnimation) {

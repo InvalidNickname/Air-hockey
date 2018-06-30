@@ -1,3 +1,9 @@
+/*
+ * Created by Alexey Kiselev
+ * Copyright (c) 2018 . All rights reserved.
+ * Last modified 30.06.18 14:00
+ */
+
 package hockey.airhockey;
 
 class Vector {

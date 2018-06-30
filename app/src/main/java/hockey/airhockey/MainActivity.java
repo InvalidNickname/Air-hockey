@@ -1,7 +1,16 @@
+/*
+ * Created by Alexey Kiselev
+ * Copyright (c) 2018 . All rights reserved.
+ * Last modified 30.06.18 17:03
+ */
+
 package hockey.airhockey;
 
+import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -16,8 +25,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     static Settings settings;
     private ImageView volumeButton;
     private ImageView start, credits;
-    private Animation left, right;
     private boolean isAnimation;
     private SharedPreferences preferences;
 
@@ -54,32 +60,8 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         start = findViewById(R.id.start);
         credits = findViewById(R.id.credits);
-        start.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    startDecrementAnimation(start);
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    startIncrementAnimation(start);
-                }
-                return false;
-            }
-        });
-        credits.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    startDecrementAnimation(credits);
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    startIncrementAnimation(credits);
-                }
-                return false;
-            }
-        });
+        setListener(start);
+        setListener(credits);
         TextView versionText = findViewById(R.id.version);
         String versionName = "unknown";
         try {
@@ -90,16 +72,13 @@ public class MainActivity extends AppCompatActivity {
         versionText.setText(String.format(getResources().getString(R.string.about_version), versionName));
         volumeButton = findViewById(R.id.volumeButton);
         if (volume == 0) {
-            volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.volume_off, null));
+            volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.ic_volume_off, null));
         }
-        left = AnimationUtils.loadAnimation(this, R.anim.go_left);
-        right = AnimationUtils.loadAnimation(this, R.anim.go_right);
         drawGates();
     }
 
     private void hideSystemUI() {
-        View view = getWindow().getDecorView();
-        view.setSystemUiVisibility(HIDE_FLAGS);
+        getWindow().getDecorView().setSystemUiVisibility(HIDE_FLAGS);
     }
 
     @Override
@@ -108,34 +87,37 @@ public class MainActivity extends AppCompatActivity {
         hideSystemUI();
     }
 
-    private void startDecrementAnimation(View view) {
-        AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.small_decrement);
-        set.setTarget(view);
-        set.start();
-    }
+    private void setListener(final View view) {
+        view.setOnTouchListener(new View.OnTouchListener() {
 
-    private void startIncrementAnimation(View view) {
-        AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.small_increment);
-        set.setTarget(view);
-        set.start();
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(getApplicationContext(), R.animator.small_decrement);
+                    set.setTarget(view);
+                    set.start();
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(getApplicationContext(), R.animator.small_increment);
+                    set.setTarget(view);
+                    set.start();
+                }
+                return false;
+            }
+        });
     }
 
     private void drawGates() {
         ImageView upperGate = findViewById(R.id.upper_gate);
         ImageView lowerGate = findViewById(R.id.lower_gate);
-        ConstraintLayout.LayoutParams upperParams = new ConstraintLayout.LayoutParams((int) (settings.width * 0.74) - (int) (settings.width * 0.26), settings.gateHeight);
-        upperParams.leftToLeft = R.id.main;
-        upperParams.rightToRight = R.id.main;
-        upperParams.topToTop = R.id.main;
-        upperParams.bottomToBottom = R.id.main;
-        upperParams.verticalBias = 0;
+        ConstraintLayout.LayoutParams upperParams = (ConstraintLayout.LayoutParams) upperGate.getLayoutParams();
+        upperParams.height = settings.gateHeight;
+        upperParams.width = (int) (settings.width * 0.74) - (int) (settings.width * 0.26);
         upperGate.setLayoutParams(upperParams);
-        ConstraintLayout.LayoutParams lowerParams = new ConstraintLayout.LayoutParams((int) (settings.width * 0.74) - (int) (settings.width * 0.26), settings.gateHeight);
-        lowerParams.leftToLeft = R.id.main;
-        lowerParams.rightToRight = R.id.main;
-        lowerParams.topToTop = R.id.main;
-        lowerParams.bottomToBottom = R.id.main;
-        lowerParams.verticalBias = 1;
+        ConstraintLayout.LayoutParams lowerParams = (ConstraintLayout.LayoutParams) lowerGate.getLayoutParams();
+        lowerParams.height = settings.gateHeight;
+        lowerParams.width = (int) (settings.width * 0.74) - (int) (settings.width * 0.26);
         lowerGate.setLayoutParams(lowerParams);
     }
 
@@ -143,16 +125,16 @@ public class MainActivity extends AppCompatActivity {
         if (!isAnimation) {
             switch (view.getId()) {
                 case R.id.start: // нажатие на кнопку старта
-                    setAnimationListener(new Intent(MainActivity.this, GameCustomActivity.class));
+                    exitWithAnimation(new Intent(MainActivity.this, GameCustomActivity.class));
                     break;
                 case R.id.credits: // нажатие на кнопку инфо
-                    setAnimationListener(new Intent(MainActivity.this, CreditsActivity.class));
+                    exitWithAnimation(new Intent(MainActivity.this, CreditsActivity.class));
                     break;
                 case R.id.volumeButton: // нажатие на кнопку изменения громкости
                     if (volume == 1) {
-                        volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.volume_off, null));
+                        volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.ic_volume_off, null));
                     } else {
-                        volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.volume_up, null));
+                        volumeButton.setImageDrawable(VectorDrawableCompat.create(getResources(), R.drawable.ic_volume_up, null));
                     }
                     volume = ++volume % 2;
                     break;
@@ -160,27 +142,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setAnimationListener(final Intent intent) {
-        left.setAnimationListener(new Animation.AnimationListener() {
+    // анимированный выход из activity
+    private void exitWithAnimation(final Intent intent) {
+        ObjectAnimator left = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.slide);
+        left.setFloatValues(start.getX(), -start.getWidth());
+        left.setTarget(start);
+        left.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationStart(Animation animation) {
-                isAnimation = true;
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
                 start.setVisibility(GONE);
                 credits.setVisibility(GONE);
                 startActivity(intent);
                 finish();
             }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
         });
-        start.startAnimation(left);
-        credits.startAnimation(right);
+        ObjectAnimator right = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.slide);
+        right.setFloatValues(credits.getX(), settings.width);
+        right.setTarget(credits);
+        right.start();
+        left.start();
     }
 
     @Override

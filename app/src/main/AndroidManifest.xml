@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by Alexey Kiselev
+  ~ Copyright (c) 2018 . All rights reserved.
+  ~ Last modified 20.06.18 22:24
+  -->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="hockey.airhockey"
-    android:versionName="0.20.0">
+    android:versionName="0.20.1">
 
     <application
         android:allowBackup="true"
@@ -32,7 +38,7 @@
             android:alwaysRetainTaskState="true" />
         <activity
             android:name=".WinActivity"
-            android:theme="@style/WinScreenTheme"
+            android:theme="@style/TransparentTheme"
             android:alwaysRetainTaskState="true" />
         <activity
             android:name=".CreditsActivity"

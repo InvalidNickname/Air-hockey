@@ -7,6 +7,7 @@
 /build
 /captures
 .externalNativeBuild
-.idea/assetWizardSettings.xml
-
+/.idea/assetWizardSettings.xml
 /.idea/dictionaries
+/.idea/copyright/
+/.idea/misc.xml

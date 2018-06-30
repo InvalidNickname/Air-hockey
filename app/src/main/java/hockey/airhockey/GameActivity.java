@@ -1,10 +1,15 @@
+/*
+ * Created by Alexey Kiselev
+ * Copyright (c) 2018 . All rights reserved.
+ * Last modified 30.06.18 14:00
+ */
+
 package hockey.airhockey;
 
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import static hockey.airhockey.MainActivity.HIDE_FLAGS;
 
@@ -25,8 +30,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void hideSystemUI() {
-        View view = getWindow().getDecorView();
-        view.setSystemUiVisibility(HIDE_FLAGS);
+        getWindow().getDecorView().setSystemUiVisibility(HIDE_FLAGS);
     }
 
     @Override

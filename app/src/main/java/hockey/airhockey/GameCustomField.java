@@ -1,3 +1,9 @@
+/*
+ * Created by Alexey Kiselev
+ * Copyright (c) 2018 . All rights reserved.
+ * Last modified 30.06.18 19:57
+ */
+
 package hockey.airhockey;
 
 import android.annotation.SuppressLint;
@@ -68,6 +74,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
         loadGraphics();
         isSpeedSet = false;
         animStop = false;
+        psec = System.currentTimeMillis();
         thread.start();
     }
 
@@ -111,7 +118,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
         options.inPreferredConfig = Bitmap.Config.RGB_565;
         background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background, options);
         background = Bitmap.createScaledBitmap(background, settings.width, settings.height, true);
-        back = new Button(R.drawable.arrow_back, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
+        back = new Button(R.drawable.ic_arrow_back, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
         start = new Button(R.drawable.start_button, R.drawable.start_button_pressed, context, (int) (settings.width - 0.0419921875 * settings.height), settings.width, (int) (0.4375 * settings.height), (int) (0.5625 * settings.height), 0);
         mode = new Button(R.drawable.mode_button, R.drawable.mode_button_pressed, context, 0, (int) (0.0419921875 * settings.height), (int) (0.4375 * settings.height), (int) (0.5625 * settings.height), 0);
         puckLeft = new Button(R.drawable.arrow_left, context, (int) (settings.width / 2 - 1.7 * settings.playerScale - 20), settings.width / 2 - settings.playerScale - 20, (int) (settings.height / 2 - 0.7 * settings.playerScale), (int) (settings.height / 2 + 0.7 * settings.playerScale), 0);
@@ -145,6 +152,10 @@ public class GameCustomField extends SurfaceView implements Runnable {
             puckRight.draw(canvas);
             puckLeft.draw(canvas);
         }
+        back.draw(canvas);
+        player1.drawShadow(canvas);
+        player2.drawShadow(canvas);
+        puck.drawShadow(canvas);
         player1.draw(canvas);
         player2.draw(canvas);
         puck.draw(canvas);
@@ -158,7 +169,6 @@ public class GameCustomField extends SurfaceView implements Runnable {
                 modeClicked = false;
             }
         }
-        back.draw(canvas);
     }
 
     @SuppressLint("ClickableViewAccessibility")
