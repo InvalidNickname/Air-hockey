@@ -1,7 +1,7 @@
 /*
  * Created by Alexey Kiselev
  * Copyright (c) 2018 . All rights reserved.
- * Last modified 30.06.18 19:57
+ * Last modified 01.07.18 15:28
  */
 
 package hockey.airhockey;
@@ -105,11 +105,15 @@ public class GameCustomField extends SurfaceView implements Runnable {
         player2.update(delta, true);
         puck.update(delta, true);
         if (puck.x <= settings.width / 2 + settings.puckScale / 2 & !animStop) {
-            player1 = new Player(playerArray[player1Chosen], context, 1);
-            player2 = new Player(playerArray[player2Chosen], context, 2);
-            puck = new Puck(puckArray[puckChosen], context);
-            animStop = true;
+            stopAnimation();
         }
+    }
+
+    void stopAnimation() {
+        player1 = new Player(playerArray[player1Chosen], context, 1);
+        player2 = new Player(playerArray[player2Chosen], context, 2);
+        puck = new Puck(puckArray[puckChosen], context);
+        animStop = true;
     }
 
     // загрузка графики

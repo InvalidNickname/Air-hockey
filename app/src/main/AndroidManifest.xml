@@ -2,12 +2,12 @@
 <!--
   ~ Created by Alexey Kiselev
   ~ Copyright (c) 2018 . All rights reserved.
-  ~ Last modified 20.06.18 22:24
+  ~ Last modified 01.07.18 15:50
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="hockey.airhockey"
-    android:versionName="0.20.1">
+    android:versionName="0.20.2">
 
     <application
         android:allowBackup="true"

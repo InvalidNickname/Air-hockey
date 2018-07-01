@@ -1,7 +1,7 @@
 /*
  * Created by Alexey Kiselev
  * Copyright (c) 2018 . All rights reserved.
- * Last modified 30.06.18 20:15
+ * Last modified 01.07.18 15:49
  */
 
 package hockey.airhockey;
@@ -21,6 +21,9 @@ public class GameCustomActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         gameCustomField = new GameCustomField(this);
+        if (!getIntent().getBooleanExtra("firstRun", true)) {
+            gameCustomField.stopAnimation();
+        }
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setContentView(gameCustomField);
         overridePendingTransition(0, 0);

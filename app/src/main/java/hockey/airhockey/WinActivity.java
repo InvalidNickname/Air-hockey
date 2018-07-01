@@ -2,7 +2,7 @@
 /*
  * Created by Alexey Kiselev
  * Copyright (c) 2018 . All rights reserved.
- * Last modified 30.06.18 19:45
+ * Last modified 01.07.18 15:45
  */
 
 package hockey.airhockey;
@@ -27,6 +27,8 @@ import static hockey.airhockey.MainActivity.HIDE_FLAGS;
 import static hockey.airhockey.MainActivity.settings;
 
 public class WinActivity extends AppCompatActivity {
+
+    private boolean isFadeOutRunning = false;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -56,13 +58,15 @@ public class WinActivity extends AppCompatActivity {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
-                    ObjectAnimator set = (ObjectAnimator) AnimatorInflater.loadAnimator(getApplicationContext(), R.animator.fade_in);
-                    if (getIntent().getIntExtra("winner", 0) == 1) {
-                        set.setTarget(findViewById(R.id.lowerBlocker));
-                        set.start();
-                    } else {
-                        set.setTarget(findViewById(R.id.upperBlocker));
-                        set.start();
+                    if (!isFadeOutRunning) {
+                        ObjectAnimator set = (ObjectAnimator) AnimatorInflater.loadAnimator(getApplicationContext(), R.animator.fade_in);
+                        if (getIntent().getIntExtra("winner", 0) == 1) {
+                            set.setTarget(findViewById(R.id.lowerBlocker));
+                            set.start();
+                        } else {
+                            set.setTarget(findViewById(R.id.upperBlocker));
+                            set.start();
+                        }
                     }
                 }
             });
@@ -115,12 +119,13 @@ public class WinActivity extends AppCompatActivity {
             set.setTarget(findViewById(R.id.upperBlocker));
             set.start();
         }
+        isFadeOutRunning = true;
     }
 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.restart: // нажатие на кнопку рестарта
-                exitWithAnimation(new Intent(WinActivity.this, GameCustomActivity.class));
+                exitWithAnimation(new Intent(WinActivity.this, GameCustomActivity.class).putExtra("firstRun", false));
                 break;
             case R.id.menuButton: // нажатие на кнопку меню
                 exitWithAnimation(new Intent(WinActivity.this, MainActivity.class));
