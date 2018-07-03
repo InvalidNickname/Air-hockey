@@ -17,7 +17,6 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,9 +25,9 @@ import android.widget.TextView;
 import static hockey.airhockey.MainActivity.HIDE_FLAGS;
 import static hockey.airhockey.MainActivity.settings;
 
-public class WinActivity extends AppCompatActivity {
+public class WinActivity extends BaseActivity {
 
-    private boolean isFadeOutRunning = false;
+    private boolean isFadeOutRunning = false, goToActivity;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -41,6 +40,7 @@ public class WinActivity extends AppCompatActivity {
         TextView winText = findViewById(R.id.winText);
         Intent intent = getIntent();
         int winner = intent.getIntExtra("winner", 0);
+        goToActivity = false;
         if (winner == 1 & !intent.getBooleanExtra("multiplayer", true)) {
             winText.setText(R.string.lose_ai);
         } else if (!intent.getBooleanExtra("multiplayer", true)) {
@@ -88,6 +88,7 @@ public class WinActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        goToActivity = true;
         exitWithAnimation(new Intent(WinActivity.this, GameCustomActivity.class));
     }
 
@@ -125,9 +126,11 @@ public class WinActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.restart: // нажатие на кнопку рестарта
+                goToActivity = true;
                 exitWithAnimation(new Intent(WinActivity.this, GameCustomActivity.class).putExtra("firstRun", false));
                 break;
             case R.id.menuButton: // нажатие на кнопку меню
+                goToActivity = true;
                 exitWithAnimation(new Intent(WinActivity.this, MainActivity.class));
                 break;
         }
@@ -158,11 +161,15 @@ public class WinActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         hideSystemUI();
+        startService(new Intent(this, MusicService.class));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        if (!goToActivity) {
+            startService(new Intent(this, MusicService.class).putExtra("pause", true));
+        }
         finish();
     }
 }

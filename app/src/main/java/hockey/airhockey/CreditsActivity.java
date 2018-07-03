@@ -12,7 +12,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -26,7 +25,7 @@ import static hockey.airhockey.MainActivity.HIDE_FLAGS;
 import static hockey.airhockey.MainActivity.settings;
 import static hockey.airhockey.MainActivity.volume;
 
-public class CreditsActivity extends AppCompatActivity {
+public class CreditsActivity extends BaseActivity {
 
     private ScrollView scrollView;
     private Thread thread;

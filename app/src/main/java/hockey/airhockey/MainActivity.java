@@ -21,7 +21,6 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.graphics.drawable.VectorDrawableCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -30,7 +29,7 @@ import android.widget.TextView;
 
 import static android.view.View.GONE;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     public static final String APP_PREFERENCES = "preferences";
     static final int HIDE_FLAGS = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION //
@@ -52,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         settings = new Settings(this);
+        stopService(new Intent(this, MusicService.class));
         preferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         isAnimation = false;
         volume = preferences.getFloat(APP_PREFERENCES_VOLUME, 1);

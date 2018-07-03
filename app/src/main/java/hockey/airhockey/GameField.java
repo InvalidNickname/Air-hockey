@@ -63,7 +63,7 @@ public class GameField extends SurfaceView implements Runnable {
     private double capSpeed, x, y;
     private Thread thread, graphicalThread;
     private long psec, turn, startTime, delta, sec;
-    private boolean isGraphicalThreadRunning;
+    private boolean isGraphicalThreadRunning, dragChanged1, dragChanged2, goToActivity;
 
     public GameField(Context context) {
         super(context);
@@ -105,6 +105,8 @@ public class GameField extends SurfaceView implements Runnable {
         bitmapPaint = new Paint(PAINT_FLAGS);
         setPaint();
         startingCountdown = true;
+        capSpeed = settings.height / 1560d;
+        goToActivity = false;
         loadingGame = true;
         firstWin = true;
         options = new BitmapFactory.Options();
@@ -126,6 +128,10 @@ public class GameField extends SurfaceView implements Runnable {
         return startingCountdown;
     }
 
+    boolean isGoingToActivity() {
+        return goToActivity;
+    }
+
     private void setPaint() {
         paint.setColor(Color.BLUE);
         paint.setTextSize(settings.height / 3.5f);
@@ -138,16 +144,21 @@ public class GameField extends SurfaceView implements Runnable {
 
     // обновление игры
     private void update() {
-        capSpeed = settings.height / 1560d;
         if (!isAnimation & !startingCountdown & !pause) {
             checkWinner();
             checkCollision();
             if (multiplayer) {
-                player1.setV(delta);
+                if (dragChanged1) {
+                    player1.setV(delta);
+                    dragChanged1 = false;
+                }
             } else {
                 moveBot();
             }
-            player2.setV(delta);
+            if (dragChanged2) {
+                player2.setV(delta);
+                dragChanged2 = false;
+            }
             checkGoal();
         }
         if (!startingCountdown & !pause) {
@@ -166,7 +177,7 @@ public class GameField extends SurfaceView implements Runnable {
         } else if (isAnimation & puck.v.y <= 0 & turn == 2 & puck.y <= settings.height * (2 / 3d)) {
             startGame();
         }
-        // проверка заершения стартового отсчёта
+        // проверка завершения стартового отсчёта
         if (!loadingGame) {
             if (sec - startTime > 3000 & startingCountdown) {
                 startingCountdown = false;
@@ -192,6 +203,7 @@ public class GameField extends SurfaceView implements Runnable {
             intent.putExtra("winner", 1);
             intent.putExtra("multiplayer", multiplayer);
             intent.putExtra("firstWin", firstWin);
+            goToActivity = true;
             firstWin = false;
             context.startActivity(intent);
         } else if (count2 >= settings.goalThreshold) {
@@ -199,6 +211,7 @@ public class GameField extends SurfaceView implements Runnable {
             intent.putExtra("winner", 2);
             intent.putExtra("multiplayer", multiplayer);
             intent.putExtra("firstWin", firstWin);
+            goToActivity = true;
             firstWin = false;
             context.startActivity(intent);
         }
@@ -466,6 +479,7 @@ public class GameField extends SurfaceView implements Runnable {
                     if (back.isClicked(x, y)) {
                         Intent intent = new Intent(context, GameCustomActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        goToActivity = true;
                         context.startActivity(intent);
                     }
                 }
@@ -491,10 +505,12 @@ public class GameField extends SurfaceView implements Runnable {
                         if (isDragging1 & (pointerId == dragPointer1) & multiplayer) {
                             player1.x = point.x;
                             player1.y = point.y;
+                            dragChanged1 = true;
                         }
                         if (isDragging2 & (pointerId == dragPointer2)) {
                             player2.x = point.x;
                             player2.y = point.y;
+                            dragChanged2 = true;
                         }
                     }
                 }
@@ -506,11 +522,13 @@ public class GameField extends SurfaceView implements Runnable {
                     isDragging1 = false;
                     activePointers.remove(dragPointer1);
                     dragPointer1 = -1;
+                    dragChanged1 = true;
                 }
                 if (pointerId == dragPointer2) {
                     isDragging2 = false;
                     activePointers.remove(dragPointer2);
                     dragPointer2 = -1;
+                    dragChanged2 = true;
                 }
                 break;
         }
