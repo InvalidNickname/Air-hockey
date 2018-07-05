@@ -60,10 +60,11 @@ public class GameField extends SurfaceView implements Runnable {
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, count1, count2;
     private Button play, back;
-    private double capSpeed, x, y;
+    private final double capSpeed;
+    private double x, y;
     private Thread thread, graphicalThread;
     private long psec, turn, startTime, delta, sec;
-    private boolean isGraphicalThreadRunning, dragChanged1, dragChanged2, goToActivity;
+    private boolean isGraphicalThreadRunning, dragChanged1, dragChanged2;
 
     public GameField(Context context) {
         super(context);
@@ -106,7 +107,6 @@ public class GameField extends SurfaceView implements Runnable {
         setPaint();
         startingCountdown = true;
         capSpeed = settings.height / 1560d;
-        goToActivity = false;
         loadingGame = true;
         firstWin = true;
         options = new BitmapFactory.Options();
@@ -128,9 +128,6 @@ public class GameField extends SurfaceView implements Runnable {
         return startingCountdown;
     }
 
-    boolean isGoingToActivity() {
-        return goToActivity;
-    }
 
     private void setPaint() {
         paint.setColor(Color.BLUE);
@@ -203,7 +200,6 @@ public class GameField extends SurfaceView implements Runnable {
             intent.putExtra("winner", 1);
             intent.putExtra("multiplayer", multiplayer);
             intent.putExtra("firstWin", firstWin);
-            goToActivity = true;
             firstWin = false;
             context.startActivity(intent);
         } else if (count2 >= settings.goalThreshold) {
@@ -211,7 +207,6 @@ public class GameField extends SurfaceView implements Runnable {
             intent.putExtra("winner", 2);
             intent.putExtra("multiplayer", multiplayer);
             intent.putExtra("firstWin", firstWin);
-            goToActivity = true;
             firstWin = false;
             context.startActivity(intent);
         }
@@ -479,7 +474,6 @@ public class GameField extends SurfaceView implements Runnable {
                     if (back.isClicked(x, y)) {
                         Intent intent = new Intent(context, GameCustomActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        goToActivity = true;
                         context.startActivity(intent);
                     }
                 }
@@ -522,13 +516,13 @@ public class GameField extends SurfaceView implements Runnable {
                     isDragging1 = false;
                     activePointers.remove(dragPointer1);
                     dragPointer1 = -1;
-                    dragChanged1 = true;
+                    player1.resetV();
                 }
                 if (pointerId == dragPointer2) {
                     isDragging2 = false;
                     activePointers.remove(dragPointer2);
                     dragPointer2 = -1;
-                    dragChanged2 = true;
+                    player2.resetV();
                 }
                 break;
         }

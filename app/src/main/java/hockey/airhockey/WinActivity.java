@@ -17,17 +17,19 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 import static hockey.airhockey.MainActivity.HIDE_FLAGS;
+import static hockey.airhockey.MainActivity.runningActivitiesCounter;
 import static hockey.airhockey.MainActivity.settings;
 
-public class WinActivity extends BaseActivity {
+public class WinActivity extends AppCompatActivity {
 
-    private boolean isFadeOutRunning = false, goToActivity;
+    private boolean isFadeOutRunning = false;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -40,7 +42,6 @@ public class WinActivity extends BaseActivity {
         TextView winText = findViewById(R.id.winText);
         Intent intent = getIntent();
         int winner = intent.getIntExtra("winner", 0);
-        goToActivity = false;
         if (winner == 1 & !intent.getBooleanExtra("multiplayer", true)) {
             winText.setText(R.string.lose_ai);
         } else if (!intent.getBooleanExtra("multiplayer", true)) {
@@ -88,7 +89,6 @@ public class WinActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        goToActivity = true;
         exitWithAnimation(new Intent(WinActivity.this, GameCustomActivity.class));
     }
 
@@ -126,11 +126,9 @@ public class WinActivity extends BaseActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.restart: // нажатие на кнопку рестарта
-                goToActivity = true;
                 exitWithAnimation(new Intent(WinActivity.this, GameCustomActivity.class).putExtra("firstRun", false));
                 break;
             case R.id.menuButton: // нажатие на кнопку меню
-                goToActivity = true;
                 exitWithAnimation(new Intent(WinActivity.this, MainActivity.class));
                 break;
         }
@@ -160,16 +158,19 @@ public class WinActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        runningActivitiesCounter++;
         hideSystemUI();
-        startService(new Intent(this, MusicService.class));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (!goToActivity) {
-            startService(new Intent(this, MusicService.class).putExtra("pause", true));
-        }
         finish();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        runningActivitiesCounter -= 1;
     }
 }

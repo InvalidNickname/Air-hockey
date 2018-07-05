@@ -9,16 +9,19 @@ package hockey.airhockey;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import static hockey.airhockey.MainActivity.HIDE_FLAGS;
+import static hockey.airhockey.MainActivity.runningActivitiesCounter;
 
-public class GameCustomActivity extends BaseActivity {
+public class GameCustomActivity extends AppCompatActivity {
 
     private GameCustomField gameCustomField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startService(new Intent(this, MusicService.class));
         gameCustomField = new GameCustomField(this);
         if (!getIntent().getBooleanExtra("firstRun", true)) {
             gameCustomField.stopAnimation();
@@ -36,17 +39,20 @@ public class GameCustomActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         gameCustomField.pauseDrawing();
-        if (!gameCustomField.isGoingToActivity()) {
-            startService(new Intent(this, MusicService.class).putExtra("pause", true));
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         hideSystemUI();
-        startService(new Intent(this, MusicService.class));
+        runningActivitiesCounter++;
         gameCustomField.resumeDrawing();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        runningActivitiesCounter -= 1;
     }
 
     @Override

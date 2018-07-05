@@ -70,4 +70,10 @@ class Player {
         yp = y;
     }
 
+    void resetV() {
+        v.setVector(0, 0);
+        xp = x;
+        yp = y;
+    }
+
 }

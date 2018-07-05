@@ -5,7 +5,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="hockey.airhockey"
-    android:versionName="0.20.3">
+    android:versionName="0.20.4">
 
     <application
         android:allowBackup="true"
@@ -45,6 +45,7 @@
 
         <service
             android:name=".MusicService"
+            android:stopWithTask="true"
             android:enabled="true"
             android:exported="false" />
     </application>

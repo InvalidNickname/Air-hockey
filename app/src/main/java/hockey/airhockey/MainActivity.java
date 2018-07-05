@@ -21,6 +21,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.graphics.drawable.VectorDrawableCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,13 +30,14 @@ import android.widget.TextView;
 
 import static android.view.View.GONE;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends AppCompatActivity {
 
     public static final String APP_PREFERENCES = "preferences";
     static final int HIDE_FLAGS = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION //
             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //
             | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
     static final int PAINT_FLAGS = Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG;
+    static int runningActivitiesCounter;
     private static final String APP_PREFERENCES_VOLUME = "volume";
     static float volume;
     static Settings settings;
@@ -51,7 +53,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         settings = new Settings(this);
-        stopService(new Intent(this, MusicService.class));
         preferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         isAnimation = false;
         volume = preferences.getFloat(APP_PREFERENCES_VOLUME, 1);
@@ -84,6 +85,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        runningActivitiesCounter++;
         hideSystemUI();
     }
 
@@ -175,5 +177,11 @@ public class MainActivity extends BaseActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putFloat(APP_PREFERENCES_VOLUME, volume);
         editor.apply();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        runningActivitiesCounter -= 1;
     }
 }

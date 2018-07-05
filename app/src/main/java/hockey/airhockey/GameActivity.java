@@ -9,10 +9,12 @@ package hockey.airhockey;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import static hockey.airhockey.MainActivity.HIDE_FLAGS;
+import static hockey.airhockey.MainActivity.runningActivitiesCounter;
 
-public class GameActivity extends BaseActivity {
+public class GameActivity extends AppCompatActivity {
 
     private GameField gameField;
     private long backPressed;
@@ -36,16 +38,19 @@ public class GameActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         gameField.pauseDrawing();
-        if (!gameField.isGoingToActivity()) {
-            startService(new Intent(this, MusicService.class).putExtra("pause", true));
-        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        runningActivitiesCounter -= 1;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         hideSystemUI();
-        startService(new Intent(this, MusicService.class));
+        runningActivitiesCounter++;
         gameField.resumeDrawing();
     }
 

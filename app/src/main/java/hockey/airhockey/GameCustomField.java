@@ -36,7 +36,7 @@ public class GameCustomField extends SurfaceView implements Runnable {
     private final SharedPreferences preferences;
     private final Paint paint;
     private Thread thread;
-    private boolean isDrawing, isSpeedSet, animStop, multiplayer, modeClicked, goToActivity;
+    private boolean isDrawing, isSpeedSet, animStop, multiplayer, modeClicked;
     private Bitmap background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
@@ -74,7 +74,6 @@ public class GameCustomField extends SurfaceView implements Runnable {
         loadGraphics();
         isSpeedSet = false;
         animStop = false;
-        goToActivity = false;
         psec = System.currentTimeMillis();
         thread.start();
     }
@@ -89,10 +88,6 @@ public class GameCustomField extends SurfaceView implements Runnable {
                 break;
             }
         }
-    }
-
-    boolean isGoingToActivity() {
-        return goToActivity;
     }
 
     // обновление игры
@@ -196,7 +191,6 @@ public class GameCustomField extends SurfaceView implements Runnable {
                 if (back.isClicked(x, y)) {
                     Intent intent = new Intent(context, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    goToActivity = true;
                     context.startActivity(intent);
                 }
                 if (puckLeft.isClicked(x, y)) {
@@ -253,7 +247,6 @@ public class GameCustomField extends SurfaceView implements Runnable {
                     Intent intent = new Intent(context, GameActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.putExtra("multiplayer", multiplayer);
-                    goToActivity = true;
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(APP_PREFERENCES_MULTIPLAYER, multiplayer);
                     editor.apply();

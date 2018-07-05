@@ -14,7 +14,8 @@ import android.view.Display;
 final class Settings {
 
     final double frictionValue;
-    final int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime, numberOfPucks, numberOfPlayers, goalThreshold, modeChangeTime, UPS;
+    final int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime;
+    final int numberOfPucks, numberOfPlayers, goalThreshold, modeChangeTime, UPS;
     final float baseVolume, baseBackgroundVolume;
     final boolean friction;
 

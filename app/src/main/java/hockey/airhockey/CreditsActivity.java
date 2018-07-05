@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -22,10 +23,11 @@ import android.widget.Space;
 import java.io.IOException;
 
 import static hockey.airhockey.MainActivity.HIDE_FLAGS;
+import static hockey.airhockey.MainActivity.runningActivitiesCounter;
 import static hockey.airhockey.MainActivity.settings;
 import static hockey.airhockey.MainActivity.volume;
 
-public class CreditsActivity extends BaseActivity {
+public class CreditsActivity extends AppCompatActivity {
 
     private ScrollView scrollView;
     private Thread thread;
@@ -80,6 +82,7 @@ public class CreditsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        runningActivitiesCounter++;
         thread = new Thread(runnable);
         sec = System.currentTimeMillis();
         thread.start();
@@ -100,6 +103,12 @@ public class CreditsActivity extends BaseActivity {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        runningActivitiesCounter -= 1;
     }
 
     @Override
