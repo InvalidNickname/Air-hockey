@@ -9,6 +9,7 @@ package hockey.airhockey;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -34,9 +35,16 @@ import static hockey.airhockey.GameCustomField.player2Chosen;
 import static hockey.airhockey.GameCustomField.playerArray;
 import static hockey.airhockey.GameCustomField.puckArray;
 import static hockey.airhockey.GameCustomField.puckChosen;
+import static hockey.airhockey.MainActivity.APP_PREFERENCES;
 import static hockey.airhockey.MainActivity.PAINT_FLAGS;
 import static hockey.airhockey.MainActivity.settings;
 import static hockey.airhockey.MainActivity.volume;
+import static hockey.airhockey.SettingsActivity.APP_PREFERENCES_GAME_LENGTH_TIME;
+import static hockey.airhockey.SettingsActivity.APP_PREFERENCES_GAME_MODE;
+import static hockey.airhockey.SettingsActivity.APP_PREFERENCES_GOAL_THRESHOLD;
+import static hockey.airhockey.SettingsActivity.APP_PREFERENCES_MULTIPLAYER;
+import static hockey.airhockey.SettingsActivity.GAME_MODE_POINTS;
+import static hockey.airhockey.SettingsActivity.GAME_MODE_TIME;
 import static hockey.airhockey.Utils.calculateLength;
 import static hockey.airhockey.Utils.dpToPx;
 
@@ -46,13 +54,17 @@ public class GameField extends SurfaceView implements Runnable {
     private final SurfaceHolder holder;
     private final SoundPool soundPool;
     private final int[] hitSound = new int[5];
-    private final Paint paint, countdownPaint, bitmapPaint;
-    private final Path path;
+    private final Paint paint, countdownPaint, bitmapPaint, smallCountdownPaint, timerPaint;
+    private final Path path, timerPath;
     private final Rect bounds;
     private final Runnable graphicalRunnable;
     private final BitmapFactory.Options options;
+    private final double capSpeed;
+    private final int gameMode, goalThreshold, gameLengthTime;
+    private final boolean multiplayer;
     private int goalSound, countdownSound;
-    private boolean pause, multiplayer, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame, firstWin;
+    private String time;
+    private boolean pause, draw, isDragging1, isDragging2, isCollision1, isCollision2, isAnimation, startingCountdown, loadingGame, firstWin;
     private Bitmap background;
     private Player player1, player2;
     private Gate lowerGate, upperGate;
@@ -60,17 +72,29 @@ public class GameField extends SurfaceView implements Runnable {
     private SparseArray<PointF> activePointers;
     private int dragPointer1, dragPointer2, count1, count2;
     private Button play, back;
-    private final double capSpeed;
     private double x, y;
     private Thread thread, graphicalThread;
-    private long psec, turn, startTime, delta, sec;
+    private long psec, turn, startTime, delta, sec, timeRemaining;
     private boolean isGraphicalThreadRunning, dragChanged1, dragChanged2;
 
     public GameField(Context context) {
         super(context);
         this.context = context;
+        // получение и установка настроек
+        SharedPreferences preferences = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        multiplayer = preferences.getBoolean(APP_PREFERENCES_MULTIPLAYER, true);
+        gameMode = preferences.getInt(APP_PREFERENCES_GAME_MODE, GAME_MODE_POINTS);
+        goalThreshold = preferences.getInt(APP_PREFERENCES_GOAL_THRESHOLD, 7);
+        gameLengthTime = preferences.getInt(APP_PREFERENCES_GAME_LENGTH_TIME, 2);
+        capSpeed = settings.height / 1560d;
+        turn = Math.round(Math.random()) + 1;
+        startingCountdown = true;
+        loadingGame = true;
+        firstWin = true;
+        // настройка потоков
         thread = new Thread();
         isGraphicalThreadRunning = false;
+        holder = getHolder();
         graphicalRunnable = new Runnable() {
             @Override
             public void run() {
@@ -85,6 +109,7 @@ public class GameField extends SurfaceView implements Runnable {
             }
         };
         graphicalThread = new Thread(graphicalRunnable);
+        // загрузка музыки и звуков
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             soundPool = new SoundPool.Builder().setMaxStreams(5).build();
         } else {
@@ -95,40 +120,25 @@ public class GameField extends SurfaceView implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        holder = getHolder();
+        // загрузка и настройка графики
         path = new Path();
+        timerPath = new Path();
         bounds = new Rect();
-        count1 = 0;
-        count2 = 0;
-        turn = Math.round(Math.random()) + 1;
         paint = new Paint(PAINT_FLAGS);
         countdownPaint = new Paint(PAINT_FLAGS);
+        smallCountdownPaint = new Paint(PAINT_FLAGS);
         bitmapPaint = new Paint(PAINT_FLAGS);
+        timerPaint = new Paint(PAINT_FLAGS);
         setPaint();
-        startingCountdown = true;
-        capSpeed = settings.height / 1560d;
-        loadingGame = true;
-        firstWin = true;
         options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
+        // начало игры, запуск потоков
         startGame();
         thread.start();
         graphicalThread.start();
     }
 
-    void setMultiplayer(boolean multiplayer) {
-        this.multiplayer = multiplayer;
-    }
-
-    void setPause() {
-        pause = true;
-    }
-
-    boolean isAbleToPause() {
-        return startingCountdown;
-    }
-
-
+    // настройка paint
     private void setPaint() {
         paint.setColor(Color.BLUE);
         paint.setTextSize(settings.height / 3.5f);
@@ -137,107 +147,29 @@ public class GameField extends SurfaceView implements Runnable {
         countdownPaint.setColor(ContextCompat.getColor(context, R.color.countdownText));
         countdownPaint.setTextSize(settings.height / 3f);
         countdownPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/aldrich.ttf"));
+        smallCountdownPaint.setColor(ContextCompat.getColor(context, R.color.countdownText));
+        timerPaint.setColor(ContextCompat.getColor(context, R.color.colorText));
+        findBestTextSize();
     }
 
-    // обновление игры
-    private void update() {
-        if (!isAnimation & !startingCountdown & !pause) {
-            checkWinner();
-            checkCollision();
-            if (multiplayer) {
-                if (dragChanged1) {
-                    player1.setV(delta);
-                    dragChanged1 = false;
-                }
-            } else {
-                moveBot();
-            }
-            if (dragChanged2) {
-                player2.setV(delta);
-                dragChanged2 = false;
-            }
-            checkGoal();
-        }
-        if (!startingCountdown & !pause) {
-            player1.update(delta, isAnimation || !multiplayer);
-            player2.update(delta, isAnimation);
-            puck.update(delta, isAnimation);
-        }
-        // проверка завершения анимации после гола
-        if (isAnimation & puck.v.y >= 0 & turn == 1 & puck.y >= settings.height / 3) {
-            startGame();
-        } else if (isAnimation & puck.v.y <= 0 & turn == 1 & puck.y <= settings.height / 3) {
-            startGame();
-        }
-        if (isAnimation & puck.v.y >= 0 & turn == 2 & puck.y >= settings.height * (2 / 3d)) {
-            startGame();
-        } else if (isAnimation & puck.v.y <= 0 & turn == 2 & puck.y <= settings.height * (2 / 3d)) {
-            startGame();
-        }
-        // проверка завершения стартового отсчёта
-        if (!loadingGame) {
-            if (sec - startTime > 3000 & startingCountdown) {
-                startingCountdown = false;
+    // нахождение лучшего размера текста
+    private void findBestTextSize() {
+        int i = 0;
+        while (true) {
+            i++;
+            smallCountdownPaint.setTextSize(settings.height / i);
+            if (smallCountdownPaint.measureText(context.getResources().getQuantityString(R.plurals.countdown_mode_points, goalThreshold, goalThreshold)) <= settings.width * (1 / 2.5f)) {
+                break;
             }
         }
-    }
-
-    // проверка гола
-    private void checkGoal() {
-        if (puck.y < 0) {
-            count2++;
-            playGoal();
-        } else if (puck.y > settings.height) {
-            count1++;
-            playGoal();
+        i = 0;
+        while (true) {
+            i++;
+            timerPaint.setTextSize(settings.height / i);
+            if (timerPaint.measureText("0:00") <= settings.width * (1 / 9f)) {
+                break;
+            }
         }
-    }
-
-    // проверка победителя и завершения игры
-    private void checkWinner() {
-        if (count1 >= settings.goalThreshold) {
-            Intent intent = new Intent(context, WinActivity.class);
-            intent.putExtra("winner", 1);
-            intent.putExtra("multiplayer", multiplayer);
-            intent.putExtra("firstWin", firstWin);
-            firstWin = false;
-            context.startActivity(intent);
-        } else if (count2 >= settings.goalThreshold) {
-            Intent intent = new Intent(context, WinActivity.class);
-            intent.putExtra("winner", 2);
-            intent.putExtra("multiplayer", multiplayer);
-            intent.putExtra("firstWin", firstWin);
-            firstWin = false;
-            context.startActivity(intent);
-        }
-    }
-
-    // анимация перемещения шайбы и бит на изначальные позиции после гола
-    private void playGoal() {
-        isAnimation = true;
-        soundPool.play(goalSound, volume, volume, 0, 0, 1);
-        if (turn == 1) {
-            puck.v.setVector((settings.width / 2d - puck.x) / settings.goalStopTime, (settings.height / 3d - puck.y) / settings.goalStopTime);
-        } else {
-            puck.v.setVector((settings.width / 2d - puck.x) / settings.goalStopTime, (settings.height * (2 / 3d) - puck.y) / settings.goalStopTime);
-        }
-        player1.v.setVector((settings.width / 2d - player1.x) / settings.goalStopTime, (1.4 * settings.playerScale - player1.y) / settings.goalStopTime);
-        player2.v.setVector((settings.width / 2d - player2.x) / settings.goalStopTime, (settings.height - 1.4 * settings.playerScale - player2.y) / settings.goalStopTime);
-    }
-
-    // начало новой игры
-    private void startGame() {
-        activePointers = new SparseArray<>();
-        isCollision1 = false;
-        isCollision2 = false;
-        loadGraphics();
-        if (turn == 1) {
-            turn = 2;
-        } else {
-            turn = 1;
-        }
-        isAnimation = false;
-        psec = System.currentTimeMillis();
     }
 
     // загрузка звуков
@@ -279,6 +211,147 @@ public class GameField extends SurfaceView implements Runnable {
         upperGate = new Gate(R.drawable.upper_gate, context, 2);
     }
 
+    // начало новой игры
+    private void startGame() {
+        activePointers = new SparseArray<>();
+        isCollision1 = false;
+        isCollision2 = false;
+        loadGraphics();
+        if (turn == 1) {
+            turn = 2;
+        } else {
+            turn = 1;
+        }
+        isAnimation = false;
+        psec = System.currentTimeMillis();
+    }
+
+    // пауза игры
+    void setPause() {
+        if (!startingCountdown) {
+            pause = true;
+        }
+    }
+
+    // обновление игры
+    private void update() {
+        if (!isAnimation & !startingCountdown & !pause) {
+            checkWinner();
+            checkCollision();
+            if (multiplayer) {
+                if (dragChanged1) {
+                    player1.setV(delta);
+                    dragChanged1 = false;
+                }
+            } else {
+                moveBot();
+            }
+            if (dragChanged2) {
+                player2.setV(delta);
+                dragChanged2 = false;
+            }
+            checkGoal();
+        }
+        if (!startingCountdown & !pause) {
+            player1.update(delta, isAnimation || !multiplayer);
+            player2.update(delta, isAnimation);
+            puck.update(delta, isAnimation);
+        }
+        // проверка завершения анимации после гола
+        if (isAnimation & puck.v.y >= 0 & turn == 1 & puck.y >= settings.height / 3) {
+            startGame();
+        } else if (isAnimation & puck.v.y <= 0 & turn == 1 & puck.y <= settings.height / 3) {
+            startGame();
+        }
+        if (isAnimation & puck.v.y >= 0 & turn == 2 & puck.y >= settings.height * (2 / 3d)) {
+            startGame();
+        } else if (isAnimation & puck.v.y <= 0 & turn == 2 & puck.y <= settings.height * (2 / 3d)) {
+            startGame();
+        }
+        // проверка завершения стартового отсчёта
+        if (!loadingGame) {
+            if (sec - startTime > 3000 & startingCountdown) {
+                startingCountdown = false;
+                startTime = sec;
+            }
+        }
+        timeRemaining = gameLengthTime * 60 * 1000 - (sec - startTime);
+        time = timeRemaining / 1000 / 60 + ":" + timeRemaining / 1000 % 60;
+    }
+
+    // проверка гола
+    private void checkGoal() {
+        if (puck.y < 0) {
+            count2++;
+            playGoal();
+        } else if (puck.y > settings.height) {
+            count1++;
+            playGoal();
+        }
+    }
+
+    // проверка победителя и завершения игры
+    private void checkWinner() {
+        switch (gameMode) {
+            case GAME_MODE_POINTS:
+                if (count1 >= goalThreshold) {
+                    Intent intent = new Intent(context, WinActivity.class);
+                    intent.putExtra("winner", 1);
+                    intent.putExtra("multiplayer", multiplayer);
+                    intent.putExtra("firstWin", firstWin);
+                    firstWin = false;
+                    context.startActivity(intent);
+                } else if (count2 >= goalThreshold) {
+                    Intent intent = new Intent(context, WinActivity.class);
+                    intent.putExtra("winner", 2);
+                    intent.putExtra("multiplayer", multiplayer);
+                    intent.putExtra("firstWin", firstWin);
+                    firstWin = false;
+                    context.startActivity(intent);
+                }
+                break;
+            case GAME_MODE_TIME:
+                if (timeRemaining <= 0) {
+                    if (count1 > count2) {
+                        Intent intent = new Intent(context, WinActivity.class);
+                        intent.putExtra("winner", 1);
+                        intent.putExtra("multiplayer", multiplayer);
+                        intent.putExtra("firstWin", firstWin);
+                        firstWin = false;
+                        context.startActivity(intent);
+                    } else if (count2 > count1) {
+                        Intent intent = new Intent(context, WinActivity.class);
+                        intent.putExtra("winner", 2);
+                        intent.putExtra("multiplayer", multiplayer);
+                        intent.putExtra("firstWin", firstWin);
+                        firstWin = false;
+                        context.startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(context, WinActivity.class);
+                        intent.putExtra("winner", 0);
+                        intent.putExtra("multiplayer", multiplayer);
+                        intent.putExtra("firstWin", firstWin);
+                        firstWin = false;
+                        context.startActivity(intent);
+                    }
+                }
+        }
+
+    }
+
+    // анимация перемещения шайбы и бит на изначальные позиции после гола
+    private void playGoal() {
+        isAnimation = true;
+        soundPool.play(goalSound, volume, volume, 0, 0, 1);
+        if (turn == 1) {
+            puck.v.setVector((settings.width / 2d - puck.x) / settings.goalStopTime, (settings.height / 3d - puck.y) / settings.goalStopTime);
+        } else {
+            puck.v.setVector((settings.width / 2d - puck.x) / settings.goalStopTime, (settings.height * (2 / 3d) - puck.y) / settings.goalStopTime);
+        }
+        player1.v.setVector((settings.width / 2d - player1.x) / settings.goalStopTime, (1.4 * settings.playerScale - player1.y) / settings.goalStopTime);
+        player2.v.setVector((settings.width / 2d - player2.x) / settings.goalStopTime, (settings.height - 1.4 * settings.playerScale - player2.y) / settings.goalStopTime);
+    }
+
     // рисование
     private void drawOnCanvas(Canvas canvas) {
         canvas.drawBitmap(background, 0, 0, bitmapPaint);
@@ -289,6 +362,13 @@ public class GameField extends SurfaceView implements Runnable {
         path.moveTo((settings.width + paint.measureText(String.valueOf(count1))) / 2f, (settings.height / 1.9f - bounds.height()) / 2f);
         path.lineTo((settings.width - paint.measureText(String.valueOf(count1))) / 2f, (settings.height / 1.9f - bounds.height()) / 2f);
         canvas.drawTextOnPath(String.valueOf(count1), path, 0, 0, paint);
+        if (!startingCountdown & gameMode == GAME_MODE_TIME) {
+            timerPath.reset();
+            timerPaint.getTextBounds(time, 0, 1, bounds);
+            timerPath.moveTo(settings.width - bounds.height() * 1.5f, settings.height / 2 - timerPaint.measureText(time) / 2);
+            timerPath.lineTo(settings.width - bounds.height() * 1.5f, settings.height / 2 + timerPaint.measureText(time) / 2);
+            canvas.drawTextOnPath(time, timerPath, 0, 0, timerPaint);
+        }
         paint.getTextBounds(String.valueOf(count2), 0, 1, bounds);
         canvas.drawText(String.valueOf(count2), (settings.width - paint.measureText(String.valueOf(count2))) / 2f, (settings.height * 1.475f + bounds.height()) / 2f, paint);
         player1.drawShadow(canvas);
@@ -303,6 +383,18 @@ public class GameField extends SurfaceView implements Runnable {
                 String countdown = String.valueOf((int) Math.ceil((3000 - System.currentTimeMillis() + startTime) / 1000d));
                 countdownPaint.getTextBounds(countdown, 0, 1, bounds);
                 canvas.drawText(countdown, (settings.width - countdownPaint.measureText(countdown)) / 2f, (settings.height + bounds.height()) / 2f, countdownPaint);
+                switch (gameMode) {
+                    case GAME_MODE_POINTS:
+                        String tip = context.getResources().getQuantityString(R.plurals.countdown_mode_points, goalThreshold, goalThreshold);
+                        smallCountdownPaint.getTextBounds(tip, 0, 1, bounds);
+                        canvas.drawText(tip, (settings.width - smallCountdownPaint.measureText(tip)) / 2f, 0.8f * settings.height + bounds.height() / 2f, smallCountdownPaint);
+                        break;
+                    case GAME_MODE_TIME:
+                        String tip2 = context.getResources().getQuantityString(R.plurals.countdown_mode_time, gameLengthTime, gameLengthTime);
+                        smallCountdownPaint.getTextBounds(tip2, 0, 1, bounds);
+                        canvas.drawText(tip2, (settings.width - smallCountdownPaint.measureText(tip2)) / 2f, 0.8f * settings.height + bounds.height() / 2f, smallCountdownPaint);
+                        break;
+                }
             }
         }
         if (pause) {

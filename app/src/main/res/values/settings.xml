@@ -9,9 +9,7 @@
     <integer name="start_anim_stop">700</integer> <!-- анимация перед началом игры -->
     <integer name="number_of_pucks">3</integer> <!-- кол-во изображений шайбы -->
     <integer name="number_of_players">2</integer> <!-- кол-во изображений биты -->
-    <integer name="goal_threshold">7</integer> <!-- до скольки очков идёт игра -->
-    <integer name="base_volume">60</integer> <!-- громкость в процентах -->
-    <integer name="base_background_volume">25</integer> <!-- громкость фоновой музыки -->
-    <integer name="mode_change_time">1000</integer> <!-- время на анимацию при смене режима -->
+    <integer name="base_volume">70</integer> <!-- громкость в процентах -->
+    <integer name="base_background_volume">40</integer> <!-- громкость фоновой музыки -->
     <integer name="max_ups">120</integer> <!-- частота обновления физики -->
 </resources>

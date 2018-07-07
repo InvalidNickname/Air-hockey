@@ -5,7 +5,11 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="hockey.airhockey"
-    android:versionName="0.20.4">
+    android:versionName="0.21.0">
+
+    <uses-permission
+        android:name="android.permission.GET_TASKS"
+        android:maxSdkVersion="20" />
 
     <application
         android:allowBackup="true"
@@ -42,12 +46,16 @@
             android:name=".CreditsActivity"
             android:alwaysRetainTaskState="true"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".SettingsActivity"
+            android:alwaysRetainTaskState="true"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".MusicService"
-            android:stopWithTask="true"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:stopWithTask="true" />
     </application>
 
 </manifest>

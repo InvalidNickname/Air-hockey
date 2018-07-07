@@ -59,7 +59,7 @@ public class MusicService extends Service {
                                 }
                             } else if ("hockey.airhockey/.MainActivity".equals(s) || "hockey.airhockey/.CreditsActivity".equals(s)) {
                                 stopSelf();
-                            } else if ("hockey.airhockey/.GameActivity".equals(s) || "hockey.airhockey/.GameCustomActivity".equals(s) || "hockey.airhockey/.WinActivity".equals(s)) {
+                            } else if ("hockey.airhockey/.GameActivity".equals(s) || "hockey.airhockey/.GameCustomActivity".equals(s) || "hockey.airhockey/.WinActivity".equals(s) || "hockey.airhockey/.SettingsActivity".equals(s)) {
                                 mediaPlayer.start();
                             }
                         }

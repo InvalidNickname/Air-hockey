@@ -47,6 +47,9 @@ public class WinActivity extends AppCompatActivity {
         } else if (!intent.getBooleanExtra("multiplayer", true)) {
             winText.setText(R.string.win_ai);
         }
+        if (winner == 0) {
+            winText.setText(R.string.draw);
+        }
         ConstraintLayout layout = findViewById(R.id.layout);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) layout.getLayoutParams();
         params.height = settings.height / 3;

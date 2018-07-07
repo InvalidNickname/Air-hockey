@@ -177,6 +177,20 @@
 
         music by audionautix.com
     </string>
-    <string name="vs_ai">ИИ</string>
-    <string name="vs_human">ЧЕЛОВЕК</string>
+    <string name="game_settings">режим игры</string>
+    <string name="points">на очки</string>
+    <string name="time">на время</string>
+    <plurals name="countdown_mode_points">
+        <item quantity="one">игра идёт до %1$d очка</item>
+        <item quantity="few">игра идёт до %1$d очков</item>
+        <item quantity="many">игра идёт до %1$d очков</item>
+    </plurals>
+    <plurals name="countdown_mode_time">
+        <item quantity="one">игра идет %1$d минуту</item>
+        <item quantity="few">игра идет %1$d минуты</item>
+        <item quantity="many">игра идет %1$d минут</item>
+    </plurals>
+    <string name="draw">Ничья</string>
+    <string name="win_ai">Победа</string>
+    <string name="lose_ai">Поражение</string>
 </resources>

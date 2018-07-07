@@ -6,8 +6,18 @@
         Music by audionautix.com
     </string>
     <string name="about_version">version %1$s</string>
-    <string name="vs_ai">AI</string>
-    <string name="vs_human">HUMAN</string>
-    <string name="lose_ai" translatable="false">You Lose</string>
-    <string name="win_ai" translatable="false">You Win</string>
+    <string name="lose_ai">You Lose</string>
+    <string name="win_ai">You Win</string>
+    <string name="game_settings">game mode</string>
+    <string name="points">points</string>
+    <string name="time">time</string>
+    <plurals name="countdown_mode_points">
+        <item quantity="one">the game last up to %1$d point</item>
+        <item quantity="other">the game last up to %1$d points</item>
+    </plurals>
+    <plurals name="countdown_mode_time">
+        <item quantity="one">the game goes %1$d minute</item>
+        <item quantity="other">the game goes %1$d minutes</item>
+    </plurals>
+    <string name="draw">Draw</string>
 </resources>

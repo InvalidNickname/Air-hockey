@@ -15,7 +15,7 @@ final class Settings {
 
     final double frictionValue;
     final int width, height, playerScale, puckScale, gateHeight, goalStopTime, startAnimStopTime;
-    final int numberOfPucks, numberOfPlayers, goalThreshold, modeChangeTime, UPS;
+    final int numberOfPucks, numberOfPlayers, UPS;
     final float baseVolume, baseBackgroundVolume;
     final boolean friction;
 
@@ -29,7 +29,6 @@ final class Settings {
         puckScale = width / context.getResources().getInteger(R.integer.puck_scale);
         gateHeight = height / context.getResources().getInteger(R.integer.gate_height);
         friction = context.getResources().getBoolean(R.bool.friction);
-        goalThreshold = context.getResources().getInteger(R.integer.goal_threshold);
         baseVolume = context.getResources().getInteger(R.integer.base_volume) / 100f;
         baseBackgroundVolume = context.getResources().getInteger(R.integer.base_background_volume) / 100f;
         goalStopTime = context.getResources().getInteger(R.integer.goal_stop);
@@ -37,7 +36,6 @@ final class Settings {
         frictionValue = context.getResources().getInteger(R.integer.friction_value) / 1000d;
         numberOfPucks = context.getResources().getInteger(R.integer.number_of_pucks) - 1;
         numberOfPlayers = context.getResources().getInteger(R.integer.number_of_players) - 1;
-        modeChangeTime = context.getResources().getInteger(R.integer.mode_change_time);
         UPS = context.getResources().getInteger(R.integer.max_ups);
     }
 }
