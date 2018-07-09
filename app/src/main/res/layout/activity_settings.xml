@@ -10,11 +10,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timeMode" />
+
     <ImageView
         android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="0.3"
+        android:alpha="0.2"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,14 +47,12 @@
         android:id="@+id/lowerGate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:alpha="0.3"
+        android:alpha="0.2"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/lower_gate"
         tools:ignore="ContentDescription" />
 
@@ -42,13 +60,11 @@
         android:id="@+id/upperGate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:alpha="0.3"
+        android:alpha="0.2"
         android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/upper_gate"
         tools:ignore="ContentDescription" />
 
@@ -62,7 +78,7 @@
         android:fontFamily="sans-serif-smallcaps"
         android:text="@string/game_settings"
         android:textColor="@color/colorText"
-        android:textSize="@dimen/win_text_size"
+        android:textSize="@dimen/big_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -73,11 +89,12 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/selected_item_background_moved"
         android:onClick="onClick"
         app:layout_constraintEnd_toStartOf="@+id/timeMode"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        app:layout_constraintTop_toBottomOf="@+id/divider">
 
         <TextView
             android:id="@+id/pointsText"
@@ -86,6 +103,8 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:includeFontPadding="false"
             android:text="@string/points"
             android:textColor="@color/colorText"
             android:textSize="@dimen/normal_text"
@@ -103,45 +122,44 @@
             android:layout_marginTop="8dp"
             android:text="7"
             android:textColor="@color/colorText"
-            android:textSize="@dimen/win_text_size"
+            android:textSize="@dimen/big_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/increasePoints"
             app:layout_constraintStart_toEndOf="@+id/decreasePoints"
             app:layout_constraintTop_toBottomOf="@+id/pointsText"
-            app:layout_constraintVertical_bias="0.466"
             tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/increasePoints"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="onClick"
-            app:layout_constraintBottom_toBottomOf="@+id/points"
-            app:layout_constraintDimensionRatio="h,2:3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="w,2:3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/points"
-            app:layout_constraintTop_toTopOf="@+id/points"
+            app:layout_constraintTop_toBottomOf="@+id/pointsText"
             app:srcCompat="@drawable/arrow_right"
             tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/decreasePoints"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="onClick"
-            app:layout_constraintBottom_toBottomOf="@+id/points"
-            app:layout_constraintDimensionRatio="h,2:3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="w,2:3"
             app:layout_constraintEnd_toStartOf="@+id/points"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/points"
+            app:layout_constraintTop_toBottomOf="@+id/pointsText"
             app:srcCompat="@drawable/arrow_left"
             tools:ignore="ContentDescription" />
 
@@ -154,11 +172,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:onClick="onClick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/pointsMode"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        app:layout_constraintTop_toBottomOf="@+id/divider">
 
         <TextView
             android:id="@+id/timeText"
@@ -167,7 +185,10 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:includeFontPadding="false"
             android:text="@string/time"
+            android:textAllCaps="false"
             android:textColor="@color/colorText"
             android:textSize="@dimen/normal_text"
             app:layout_constraintEnd_toEndOf="parent"
@@ -184,7 +205,7 @@
             android:layout_marginTop="8dp"
             android:text="2"
             android:textColor="@color/colorText"
-            android:textSize="@dimen/win_text_size"
+            android:textSize="@dimen/big_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/increaseTime"
             app:layout_constraintStart_toEndOf="@+id/decreaseTime"
@@ -193,15 +214,16 @@
 
         <ImageView
             android:id="@+id/increaseTime"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:clickable="false"
             android:onClick="onClick"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="h,2:3"
+            app:layout_constraintDimensionRatio="w,2:3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/time"
             app:layout_constraintTop_toBottomOf="@+id/timeText"
@@ -210,7 +232,7 @@
 
         <ImageView
             android:id="@+id/decreaseTime"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
@@ -218,7 +240,7 @@
             android:layout_marginTop="8dp"
             android:onClick="onClick"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="h,2:3"
+            app:layout_constraintDimensionRatio="w,2:3"
             app:layout_constraintEnd_toStartOf="@+id/time"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/timeText"
@@ -230,26 +252,26 @@
     <ImageView
         android:id="@+id/singleplayerMode"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:adjustViewBounds="true"
+        android:background="@drawable/selected_item_background"
         android:onClick="onClick"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/multiplayerMode"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeMode"
+        app:layout_constraintTop_toBottomOf="@+id/divider2"
         app:srcCompat="@drawable/human_vs_ai"
         tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/multiplayerMode"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
@@ -259,7 +281,6 @@
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/apply"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/singleplayerMode"
         app:srcCompat="@drawable/human_vs_human"

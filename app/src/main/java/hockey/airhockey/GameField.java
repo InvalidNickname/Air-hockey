@@ -60,7 +60,7 @@ public class GameField extends SurfaceView implements Runnable {
     private final Runnable graphicalRunnable;
     private final BitmapFactory.Options options;
     private final double capSpeed;
-    private final int gameMode, goalThreshold, gameLengthTime;
+    private final int gameMode, goalThreshold;
     private final boolean multiplayer;
     private int goalSound, countdownSound;
     private String time;
@@ -70,12 +70,12 @@ public class GameField extends SurfaceView implements Runnable {
     private Gate lowerGate, upperGate;
     private Puck puck;
     private SparseArray<PointF> activePointers;
-    private int dragPointer1, dragPointer2, count1, count2;
+    private int dragPointer1, dragPointer2, count1, count2, gameLengthTime;
     private Button play, back;
     private double x, y;
     private Thread thread, graphicalThread;
-    private long psec, turn, startTime, delta, sec, timeRemaining;
-    private boolean isGraphicalThreadRunning, dragChanged1, dragChanged2;
+    private long psec, turn, startTime, delta, sec, timeRemaining, pauseStart;
+    private boolean dragChanged1, dragChanged2;
 
     public GameField(Context context) {
         super(context);
@@ -85,7 +85,7 @@ public class GameField extends SurfaceView implements Runnable {
         multiplayer = preferences.getBoolean(APP_PREFERENCES_MULTIPLAYER, true);
         gameMode = preferences.getInt(APP_PREFERENCES_GAME_MODE, GAME_MODE_POINTS);
         goalThreshold = preferences.getInt(APP_PREFERENCES_GOAL_THRESHOLD, 7);
-        gameLengthTime = preferences.getInt(APP_PREFERENCES_GAME_LENGTH_TIME, 2);
+        gameLengthTime = preferences.getInt(APP_PREFERENCES_GAME_LENGTH_TIME, 2) * 60 * 1000;
         capSpeed = settings.height / 1560d;
         turn = Math.round(Math.random()) + 1;
         startingCountdown = true;
@@ -93,17 +93,15 @@ public class GameField extends SurfaceView implements Runnable {
         firstWin = true;
         // настройка потоков
         thread = new Thread();
-        isGraphicalThreadRunning = false;
         holder = getHolder();
         graphicalRunnable = new Runnable() {
             @Override
             public void run() {
                 while (draw) {
-                    if (holder.getSurface().isValid() & isGraphicalThreadRunning) {
+                    if (holder.getSurface().isValid()) {
                         Canvas canvas = holder.lockCanvas();
                         drawOnCanvas(canvas);
                         holder.unlockCanvasAndPost(canvas);
-                        isGraphicalThreadRunning = false;
                     }
                 }
             }
@@ -132,6 +130,7 @@ public class GameField extends SurfaceView implements Runnable {
         setPaint();
         options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
+        loadGraphicsOnce();
         // начало игры, запуск потоков
         startGame();
         thread.start();
@@ -150,6 +149,10 @@ public class GameField extends SurfaceView implements Runnable {
         smallCountdownPaint.setColor(ContextCompat.getColor(context, R.color.countdownText));
         timerPaint.setColor(ContextCompat.getColor(context, R.color.colorText));
         findBestTextSize();
+        timerPath.reset();
+        timerPaint.getTextBounds("0:00", 0, 4, bounds);
+        timerPath.moveTo(settings.width - bounds.height() * 1.5f, settings.height / 2 - timerPaint.measureText("0:00") / 2);
+        timerPath.lineTo(settings.width - bounds.height() * 1.5f, settings.height / 2 + timerPaint.measureText("0:00") / 2);
     }
 
     // нахождение лучшего размера текста
@@ -194,12 +197,17 @@ public class GameField extends SurfaceView implements Runnable {
         countdownSound = soundPool.load(context.getAssets().openFd("sounds/countdown.wav"), 1);
     }
 
-    // загрузка графики
-    private void loadGraphics() {
+    // загрузка графики только в начале игры
+    private void loadGraphicsOnce() {
+        background = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.background, options), settings.width, settings.height, true);
         play = new Button(R.drawable.ic_play_circle_orange, context, (int) (0.4 * settings.width), (int) (0.6 * settings.width), (int) (settings.height / 2 - 0.1 * settings.width), (int) (settings.height / 2 + 0.1 * settings.width), 0);
         back = new Button(R.drawable.ic_arrow_back_orange, context, dpToPx(8), dpToPx(32), dpToPx(8), dpToPx(32), dpToPx(12));
-        background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background, options);
-        background = Bitmap.createScaledBitmap(background, settings.width, settings.height, true);
+        lowerGate = new Gate(R.drawable.lower_gate, context, 1);
+        upperGate = new Gate(R.drawable.upper_gate, context, 2);
+    }
+
+    // загрузка графики
+    private void loadGraphics() {
         player1 = new Player(playerArray[player1Chosen], context, 1);
         player2 = new Player(playerArray[player2Chosen], context, 2);
         if (count2 == 0 & count1 == 0) {
@@ -207,8 +215,6 @@ public class GameField extends SurfaceView implements Runnable {
         } else {
             puck = new Puck(puckArray[puckChosen], context, turn);
         }
-        lowerGate = new Gate(R.drawable.lower_gate, context, 1);
-        upperGate = new Gate(R.drawable.upper_gate, context, 2);
     }
 
     // начало новой игры
@@ -230,6 +236,7 @@ public class GameField extends SurfaceView implements Runnable {
     void setPause() {
         if (!startingCountdown) {
             pause = true;
+            pauseStart = System.currentTimeMillis();
         }
     }
 
@@ -275,8 +282,14 @@ public class GameField extends SurfaceView implements Runnable {
                 startTime = sec;
             }
         }
-        timeRemaining = gameLengthTime * 60 * 1000 - (sec - startTime);
-        time = timeRemaining / 1000 / 60 + ":" + timeRemaining / 1000 % 60;
+        if (!pause) {
+            timeRemaining = gameLengthTime - (sec - startTime);
+            if (timeRemaining / 1000 % 60 <= 9) {
+                time = timeRemaining / 1000 / 60 + ":0" + timeRemaining / 1000 % 60;
+            } else {
+                time = timeRemaining / 1000 / 60 + ":" + timeRemaining / 1000 % 60;
+            }
+        }
     }
 
     // проверка гола
@@ -357,19 +370,15 @@ public class GameField extends SurfaceView implements Runnable {
         canvas.drawBitmap(background, 0, 0, bitmapPaint);
         lowerGate.draw(canvas);
         upperGate.draw(canvas);
-        paint.getTextBounds(String.valueOf(count1), 0, 1, bounds);
+        paint.getTextBounds(String.valueOf(count1), 0, String.valueOf(count1).length(), bounds);
         path.reset();
         path.moveTo((settings.width + paint.measureText(String.valueOf(count1))) / 2f, (settings.height / 1.9f - bounds.height()) / 2f);
         path.lineTo((settings.width - paint.measureText(String.valueOf(count1))) / 2f, (settings.height / 1.9f - bounds.height()) / 2f);
         canvas.drawTextOnPath(String.valueOf(count1), path, 0, 0, paint);
         if (!startingCountdown & gameMode == GAME_MODE_TIME) {
-            timerPath.reset();
-            timerPaint.getTextBounds(time, 0, 1, bounds);
-            timerPath.moveTo(settings.width - bounds.height() * 1.5f, settings.height / 2 - timerPaint.measureText(time) / 2);
-            timerPath.lineTo(settings.width - bounds.height() * 1.5f, settings.height / 2 + timerPaint.measureText(time) / 2);
             canvas.drawTextOnPath(time, timerPath, 0, 0, timerPaint);
         }
-        paint.getTextBounds(String.valueOf(count2), 0, 1, bounds);
+        paint.getTextBounds(String.valueOf(count2), 0, String.valueOf(count2).length(), bounds);
         canvas.drawText(String.valueOf(count2), (settings.width - paint.measureText(String.valueOf(count2))) / 2f, (settings.height * 1.475f + bounds.height()) / 2f, paint);
         player1.drawShadow(canvas);
         player2.drawShadow(canvas);
@@ -386,12 +395,12 @@ public class GameField extends SurfaceView implements Runnable {
                 switch (gameMode) {
                     case GAME_MODE_POINTS:
                         String tip = context.getResources().getQuantityString(R.plurals.countdown_mode_points, goalThreshold, goalThreshold);
-                        smallCountdownPaint.getTextBounds(tip, 0, 1, bounds);
+                        smallCountdownPaint.getTextBounds(tip, 0, tip.length(), bounds);
                         canvas.drawText(tip, (settings.width - smallCountdownPaint.measureText(tip)) / 2f, 0.8f * settings.height + bounds.height() / 2f, smallCountdownPaint);
                         break;
                     case GAME_MODE_TIME:
-                        String tip2 = context.getResources().getQuantityString(R.plurals.countdown_mode_time, gameLengthTime, gameLengthTime);
-                        smallCountdownPaint.getTextBounds(tip2, 0, 1, bounds);
+                        String tip2 = context.getResources().getQuantityString(R.plurals.countdown_mode_time, gameLengthTime / 60 / 1000, gameLengthTime / 60 / 1000);
+                        smallCountdownPaint.getTextBounds(tip2, 0, tip2.length(), bounds);
                         canvas.drawText(tip2, (settings.width - smallCountdownPaint.measureText(tip2)) / 2f, 0.8f * settings.height + bounds.height() / 2f, smallCountdownPaint);
                         break;
                 }
@@ -523,9 +532,6 @@ public class GameField extends SurfaceView implements Runnable {
                 update();
                 psec = sec;
             }
-            if (!isGraphicalThreadRunning) {
-                isGraphicalThreadRunning = true;
-            }
         }
     }
 
@@ -562,6 +568,8 @@ public class GameField extends SurfaceView implements Runnable {
                 if (pause) {
                     if (play.isClicked(x, y)) {
                         pause = false;
+                        // увеличение времени игры на время при паузе
+                        gameLengthTime += sec - pauseStart;
                     }
                     if (back.isClicked(x, y)) {
                         Intent intent = new Intent(context, GameCustomActivity.class);
@@ -608,13 +616,17 @@ public class GameField extends SurfaceView implements Runnable {
                     isDragging1 = false;
                     activePointers.remove(dragPointer1);
                     dragPointer1 = -1;
-                    player1.resetV();
+                    if (!isAnimation & !pause) {
+                        player1.resetV();
+                    }
                 }
                 if (pointerId == dragPointer2) {
                     isDragging2 = false;
                     activePointers.remove(dragPointer2);
                     dragPointer2 = -1;
-                    player2.resetV();
+                    if (!isAnimation & !pause) {
+                        player2.resetV();
+                    }
                 }
                 break;
         }

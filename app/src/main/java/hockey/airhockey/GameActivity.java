@@ -35,6 +35,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         gameField.pauseDrawing();
+        gameField.setPause();
     }
 
     @Override

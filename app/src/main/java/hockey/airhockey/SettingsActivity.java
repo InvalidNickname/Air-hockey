@@ -1,11 +1,15 @@
 package hockey.airhockey;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,10 +35,11 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(0, 0);
         setContentView(R.layout.activity_settings);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        overridePendingTransition(0, 0);
         drawGates();
+        // подсвечивание выбранных ранее настроек
         preferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         multiplayer = preferences.getBoolean(APP_PREFERENCES_MULTIPLAYER, true);
         if (multiplayer) {
@@ -54,6 +59,8 @@ public class SettingsActivity extends AppCompatActivity {
         gameLengthTime = preferences.getInt(APP_PREFERENCES_GAME_LENGTH_TIME, 2);
         TextView time = findViewById(R.id.time);
         time.setText(String.valueOf(gameLengthTime));
+        // установка аниматоров
+        setListener(findViewById(R.id.apply));
     }
 
     @Override
@@ -72,13 +79,13 @@ public class SettingsActivity extends AppCompatActivity {
         ConstraintLayout timeMode = findViewById(R.id.timeMode);
         timeMode.setBackground(null);
         ConstraintLayout pointsMode = findViewById(R.id.pointsMode);
-        pointsMode.setBackground(getResources().getDrawable(R.drawable.stroke));
+        pointsMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background_moved));
     }
 
     private void selectGameModeTime() {
         gameMode = GAME_MODE_TIME;
         ConstraintLayout timeMode = findViewById(R.id.timeMode);
-        timeMode.setBackground(getResources().getDrawable(R.drawable.stroke));
+        timeMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background_moved));
         ConstraintLayout pointsMode = findViewById(R.id.pointsMode);
         pointsMode.setBackground(null);
     }
@@ -86,7 +93,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void selectGameModeSingleplayer() {
         multiplayer = false;
         ImageView singleplayerMode = findViewById(R.id.singleplayerMode);
-        singleplayerMode.setBackground(getResources().getDrawable(R.drawable.stroke));
+        singleplayerMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background));
         ImageView multiplayerMode = findViewById(R.id.multiplayerMode);
         multiplayerMode.setBackground(null);
     }
@@ -96,7 +103,7 @@ public class SettingsActivity extends AppCompatActivity {
         ImageView singleplayerMode = findViewById(R.id.singleplayerMode);
         singleplayerMode.setBackground(null);
         ImageView multiplayerMode = findViewById(R.id.multiplayerMode);
-        multiplayerMode.setBackground(getResources().getDrawable(R.drawable.stroke));
+        multiplayerMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background));
     }
 
     public void onClick(View view) {
@@ -112,6 +119,7 @@ public class SettingsActivity extends AppCompatActivity {
                     goalThreshold++;
                     TextView textView = findViewById(R.id.points);
                     textView.setText(String.valueOf(goalThreshold));
+                    selectGameModePoints();
                 }
                 break;
             case R.id.decreasePoints:
@@ -119,13 +127,15 @@ public class SettingsActivity extends AppCompatActivity {
                     goalThreshold -= 1;
                     TextView textView = findViewById(R.id.points);
                     textView.setText(String.valueOf(goalThreshold));
+                    selectGameModePoints();
                 }
                 break;
             case R.id.increaseTime:
-                if (gameLengthTime < 5) {
+                if (gameLengthTime < 3) {
                     gameLengthTime++;
                     TextView textView = findViewById(R.id.time);
                     textView.setText(String.valueOf(gameLengthTime));
+                    selectGameModeTime();
                 }
                 break;
             case R.id.decreaseTime:
@@ -133,6 +143,7 @@ public class SettingsActivity extends AppCompatActivity {
                     gameLengthTime -= 1;
                     TextView textView = findViewById(R.id.time);
                     textView.setText(String.valueOf(gameLengthTime));
+                    selectGameModeTime();
                 }
                 break;
             case R.id.singleplayerMode:
@@ -143,6 +154,7 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
             case R.id.apply:
                 finish();
+                overridePendingTransition(0, 0);
                 break;
         }
     }
@@ -160,6 +172,26 @@ public class SettingsActivity extends AppCompatActivity {
         lowerGate.setLayoutParams(lowerParams);
     }
 
+    private void setListener(final View view) {
+        view.setOnTouchListener(new View.OnTouchListener() {
+
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(getApplicationContext(), R.animator.small_decrement);
+                    set.setTarget(view);
+                    set.start();
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(getApplicationContext(), R.animator.small_increment);
+                    set.setTarget(view);
+                    set.start();
+                }
+                return false;
+            }
+        });
+    }
 
     @Override
     protected void onStop() {
@@ -176,5 +208,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void hideSystemUI() {
         getWindow().getDecorView().setSystemUiVisibility(HIDE_FLAGS);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(0, 0);
     }
 }

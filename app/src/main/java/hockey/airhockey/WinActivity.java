@@ -67,9 +67,15 @@ public class WinActivity extends AppCompatActivity {
                         if (getIntent().getIntExtra("winner", 0) == 1) {
                             set.setTarget(findViewById(R.id.lowerBlocker));
                             set.start();
+                        } else if (getIntent().getIntExtra("winner", 0) == 2) {
+                            set.setTarget(findViewById(R.id.upperBlocker));
+                            set.start();
                         } else {
                             set.setTarget(findViewById(R.id.upperBlocker));
                             set.start();
+                            ObjectAnimator set2 = (ObjectAnimator) AnimatorInflater.loadAnimator(getApplicationContext(), R.animator.fade_in);
+                            set2.setTarget(findViewById(R.id.lowerBlocker));
+                            set2.start();
                         }
                     }
                 }

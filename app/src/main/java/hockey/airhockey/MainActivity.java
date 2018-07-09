@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //
             | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
     static final int PAINT_FLAGS = Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG;
-    static int runningActivitiesCounter;
     private static final String APP_PREFERENCES_VOLUME = "volume";
+    static int runningActivitiesCounter;
     static float volume;
     static Settings settings;
     private ImageView volumeButton;

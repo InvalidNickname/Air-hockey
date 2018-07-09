@@ -11,5 +11,5 @@
     <integer name="number_of_players">2</integer> <!-- кол-во изображений биты -->
     <integer name="base_volume">70</integer> <!-- громкость в процентах -->
     <integer name="base_background_volume">40</integer> <!-- громкость фоновой музыки -->
-    <integer name="max_ups">120</integer> <!-- частота обновления физики -->
+    <integer name="max_ups">150</integer> <!-- частота обновления физики -->
 </resources>
