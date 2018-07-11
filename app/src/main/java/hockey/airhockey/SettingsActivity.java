@@ -5,7 +5,9 @@ import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.GradientDrawable;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +41,13 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         drawGates();
+        // установка аниматоров
+        setListener(findViewById(R.id.apply));
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
         // подсвечивание выбранных ранее настроек
         preferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         multiplayer = preferences.getBoolean(APP_PREFERENCES_MULTIPLAYER, true);
@@ -59,8 +68,6 @@ public class SettingsActivity extends AppCompatActivity {
         gameLengthTime = preferences.getInt(APP_PREFERENCES_GAME_LENGTH_TIME, 2);
         TextView time = findViewById(R.id.time);
         time.setText(String.valueOf(gameLengthTime));
-        // установка аниматоров
-        setListener(findViewById(R.id.apply));
     }
 
     @Override
@@ -79,13 +86,27 @@ public class SettingsActivity extends AppCompatActivity {
         ConstraintLayout timeMode = findViewById(R.id.timeMode);
         timeMode.setBackground(null);
         ConstraintLayout pointsMode = findViewById(R.id.pointsMode);
-        pointsMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background_moved));
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            GradientDrawable drawable = (GradientDrawable) getResources().getDrawable(R.drawable.selected_item_background_moved);
+            drawable.setGradientRadius(pointsMode.getHeight() * 0.3f);
+            // а все из-за того, что на API<21 не работает gradientRadius="30%p"
+            pointsMode.setBackground(drawable);
+        } else {
+            pointsMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background_moved));
+        }
     }
 
     private void selectGameModeTime() {
         gameMode = GAME_MODE_TIME;
         ConstraintLayout timeMode = findViewById(R.id.timeMode);
-        timeMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background_moved));
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            GradientDrawable drawable = (GradientDrawable) getResources().getDrawable(R.drawable.selected_item_background_moved);
+            drawable.setGradientRadius(timeMode.getHeight() * 0.3f);
+            // а все из-за того, что на API<21 не работает gradientRadius="30%p"
+            timeMode.setBackground(drawable);
+        } else {
+            timeMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background_moved));
+        }
         ConstraintLayout pointsMode = findViewById(R.id.pointsMode);
         pointsMode.setBackground(null);
     }
@@ -93,7 +114,14 @@ public class SettingsActivity extends AppCompatActivity {
     private void selectGameModeSingleplayer() {
         multiplayer = false;
         ImageView singleplayerMode = findViewById(R.id.singleplayerMode);
-        singleplayerMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background));
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            GradientDrawable drawable = (GradientDrawable) getResources().getDrawable(R.drawable.selected_item_background);
+            drawable.setGradientRadius(singleplayerMode.getHeight() * 0.5f);
+            // а все из-за того, что на API<21 не работает gradientRadius="50%p"
+            singleplayerMode.setBackground(drawable);
+        } else {
+            singleplayerMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background));
+        }
         ImageView multiplayerMode = findViewById(R.id.multiplayerMode);
         multiplayerMode.setBackground(null);
     }
@@ -103,7 +131,14 @@ public class SettingsActivity extends AppCompatActivity {
         ImageView singleplayerMode = findViewById(R.id.singleplayerMode);
         singleplayerMode.setBackground(null);
         ImageView multiplayerMode = findViewById(R.id.multiplayerMode);
-        multiplayerMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background));
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            GradientDrawable drawable = (GradientDrawable) getResources().getDrawable(R.drawable.selected_item_background);
+            drawable.setGradientRadius(multiplayerMode.getHeight() * 0.5f);
+            // а все из-за того, что на API<21 не работает gradientRadius="50%p"
+            multiplayerMode.setBackground(drawable);
+        } else {
+            multiplayerMode.setBackground(getResources().getDrawable(R.drawable.selected_item_background));
+        }
     }
 
     public void onClick(View view) {
