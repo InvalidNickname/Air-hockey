@@ -8,7 +8,7 @@ package hockey.airhockey;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.support.graphics.drawable.VectorDrawableCompat;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import static hockey.airhockey.MainActivity.settings;
 

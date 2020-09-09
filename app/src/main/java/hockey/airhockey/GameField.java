@@ -22,13 +22,14 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
+
+import androidx.core.content.ContextCompat;
 
 import static hockey.airhockey.GameCustomField.player1Chosen;
 import static hockey.airhockey.GameCustomField.player2Chosen;
@@ -158,21 +159,16 @@ public class GameField extends SurfaceView implements Runnable {
     // нахождение лучшего размера текста
     private void findBestTextSize() {
         int i = 0;
-        while (true) {
+        do {
             i++;
             smallCountdownPaint.setTextSize(settings.height / i);
-            if (smallCountdownPaint.measureText(context.getResources().getQuantityString(R.plurals.countdown_mode_points, goalThreshold, goalThreshold)) <= settings.width * (1 / 2.5f)) {
-                break;
-            }
-        }
+        } while (!(smallCountdownPaint.measureText(
+                context.getResources().getQuantityString(R.plurals.countdown_mode_points, goalThreshold, goalThreshold)) <= settings.width * (1 / 2.5f)));
         i = 0;
-        while (true) {
+        do {
             i++;
             timerPaint.setTextSize(settings.height / i);
-            if (timerPaint.measureText("0:00") <= settings.width * (1 / 9f)) {
-                break;
-            }
-        }
+        } while (!(timerPaint.measureText("0:00") <= settings.width * (1 / 9f)));
     }
 
     // загрузка звуков

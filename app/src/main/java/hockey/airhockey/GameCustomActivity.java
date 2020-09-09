@@ -9,7 +9,7 @@ package hockey.airhockey;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import static hockey.airhockey.MainActivity.HIDE_FLAGS;
 import static hockey.airhockey.MainActivity.runningActivitiesCounter;

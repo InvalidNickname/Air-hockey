@@ -4,7 +4,7 @@
   ~ Last modified 01.07.18 15:36
   -->
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -83,7 +83,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/pointsMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -164,9 +164,9 @@
             tools:ignore="ContentDescription" />
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/timeMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -247,7 +247,7 @@
             app:srcCompat="@drawable/arrow_left"
             tools:ignore="ContentDescription" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
         android:id="@+id/singleplayerMode"
@@ -302,4 +302,4 @@
         tools:ignore="ContentDescription" />
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
